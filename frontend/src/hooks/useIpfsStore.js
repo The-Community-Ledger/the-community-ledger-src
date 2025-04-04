@@ -2,39 +2,42 @@ import { useEffect, useState } from 'react';
 import { CID } from 'multiformats/cid';
 import { useHelia } from '@/components/providers/helia';
 
+// Custom hook for interacting with IPFS storage
+export default function useIpfsStorage() {
+    const { dagService } = useHelia(); // Access the DAG service from the Helia provider
+    const [isFetching, setIsFetching] = useState(true); // State to track if data is being fetched
+    const [isStoring, setIsStoring] = useState(false); // State to track if data is being stored
 
-export default function useIpfsStorage()  {
-    const { dagService } = useHelia();
-    const [isFetching, setIsFetching] = useState(true);
-    const [isStoring, setIsStoring] = useState(false);
-
+    // Function to fetch data from IPFS using a CID
     const fetchIpfsData = async (cid) => {
-        setIsFetching(true);
+        setIsFetching(true); // Set fetching state to true
         try {
-            const cidObj = CID.parse(cid);
-            const data = await dagService.get(cidObj);
-            return data;
+            const cidObj = CID.parse(cid); // Parse the CID string into a CID object
+            const data = await dagService.get(cidObj); // Fetch data from IPFS
+            return data; // Return the fetched data
         } catch (error) {
-            console.error('Error fetching IPFS data:', error);
-            throw error;
+            console.error('Error fetching IPFS data:', error); // Log any errors
+            throw error; // Rethrow the error for the caller to handle
         } finally {
-            setIsFetching(false);
-        }
-    }
-    
-    const storeIpfsData = async (data) => {
-        setIsStoring(true);
-        try {
-            const cid = await dagService.put(data);
-            return cid;
-        } catch (error) {
-            console.error('Error storing IPFS data:', error);
-            throw error;
-        } finally {
-            setIsStoring(false);
+            setIsFetching(false); // Set fetching state to false
         }
     }
 
+    // Function to store data in IPFS and return the CID
+    const storeIpfsData = async (data) => {
+        setIsStoring(true); // Set storing state to true
+        try {
+            const cid = await dagService.put(data); // Store data in IPFS and get the CID
+            return cid; // Return the CID of the stored data
+        } catch (error) {
+            console.error('Error storing IPFS data:', error); // Log any errors
+            throw error; // Rethrow the error for the caller to handle
+        } finally {
+            setIsStoring(false); // Set storing state to false
+        }
+    }
+
+    // Return the functions and state variables for use in components
     return {
         fetchIpfsData,
         storeIpfsData,
