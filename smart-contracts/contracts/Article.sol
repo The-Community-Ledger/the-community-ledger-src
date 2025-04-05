@@ -49,29 +49,4 @@ contract Article {
     function getParentIssue() external view returns (address) {
         return address(parentIssue); // Return the parent issue address
     }
-
-    // Function to get the article details
-    function getArticleDetails() external view returns (uint256, address, string memory, bytes32, uint256) {
-        return (id, submitter, ipfsHash, contentHash, stakeAmount); // Return the article details
-    }
-    // Function to get the article ID
-    function getArticleId() external view returns (uint256) {
-        return id; // Return the article ID
-    }
-    // Function to get the article submitter
-    function getArticleSubmitter() external view returns (address) {
-        return submitter; // Return the submitter's address
-    }          
-    // Function to get the article IPFS hash
-    function getArticleIpfsHash() external view returns (string memory) {
-        return ipfsHash; // Return the IPFS hash
-    }
-    // Function to get the article content hash
-    function getArticleContentHash() external view returns (bytes32) {
-        return contentHash; // Return the content hash
-    }
-    // Function to get the article stake amount
-    function getArticleStakeAmount() external view returns (uint256) {
-        return stakeAmount; // Return the stake amount
-    }
 }

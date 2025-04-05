@@ -62,37 +62,7 @@ contract Review {
         isChallenged = true; // Set the challenge flag to true
         emit ChallengeSubmitted(id, _challenger, _ipfsHash, address(this)); // Emit an event for the challenge submission
     }
-
-    // Function to get the challenge details
-    function getChallengeDetails() external view returns (address, string memory, bytes32, uint256) {
-        return (challenge.challenger, challenge.ipfsHash, challenge.contentHash, challenge.stakeAmount); // Return the challenge details
-    }
-
-
-    // Function to get the review details
-    function getReviewDetails() external view returns (uint256, address, string memory, bytes32, uint256) {
-        return (id, reviewer, ipfsHash, contentHash, stakeAmount); // Return the review details
-    }
-    // Function to get the review ID
-    function getReviewId() external view returns (uint256) {
-        return id; // Return the review ID
-    }
-    // Function to get the reviewer's address
-    function getReviewer() external view returns (address) {
-        return reviewer; // Return the reviewer's address
-    }
-    // Function to get the review IPFS hash    
-    function getReviewIpfsHash() external view returns (string memory) {
-        return ipfsHash; // Return the IPFS hash
-    }
-    // Function to get the review content hash
-    function getReviewContentHash() external view returns (bytes32) {
-        return contentHash; // Return the content hash
-    }
-    // Function to get the review stake amount
-    function getReviewStakeAmount() external view returns (uint256) {
-        return stakeAmount; // Return the stake amount
-    }
+    
     // Function to get the parent article address
     function getParentArticle() external view returns (address) {
         return address(parentArticle); // Return the parent article address

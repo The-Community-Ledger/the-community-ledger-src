@@ -53,19 +53,6 @@ contract JournalCore {
         emit IssueOpened(issues.length - 1,issueAddress);
     }
 
-    function getIssueCount() external view returns (uint256) {
-        return issues.length;
-    }
-
-    function getIssue(uint256 index) external view returns (address) {
-        require(index < issues.length, "Invalid issue index");
-        return address(issues[index]);
-    }
-
-    function getIssues() external view returns (IJournalIssue[] memory) {
-        return issues;
-    }
-
     function getIssueStakeRequired() external view returns (uint256) {
         return issueStakeRequired;
     }
