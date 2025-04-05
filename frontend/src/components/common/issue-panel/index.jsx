@@ -4,6 +4,7 @@ import ArticleCard from "../article-card";
 import { useWallet } from "@/hooks/useWallet";
 import styles from "./style.module.css";
 import { useIpfsStore } from "@/hooks/useIpfsStore";
+import MarkdownModal from "../markdown-modal";
 
 
 // Checks issue, display its content as articles
@@ -13,6 +14,7 @@ function IssuePanel({ issue }) {
     const { walletConnectionStatus } = useWallet();
     const { fetchIpfsData } = useIpfsStore();
     const [ description, setDescription ] = useState("");
+    const [ modalOpen, setModalOpen ] = useState(false);
 
     useEffect(() => {
         const _fetchArticles = async () => {
@@ -41,23 +43,39 @@ function IssuePanel({ issue }) {
     }, [issue.descriptionIpfsHash]);
 
     return (
-      <div className={styles.container}>
-        <div className={styles.header} > 
-          <h3 className={styles.title}>{issue.name}</h3>
-          <div className={styles.statusBadge}>
-            <p className={styles.statusText}>{issue.isOpen ? "Open" : "Closed"}</p>
+      <>
+        <MarkdownModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSubmit={(md) => {
+            console.log('Submitted markdown:', md);
+            setModalOpen(false);
+          }}
+          title={"Submit an article to " + issue.name}
+          initialValue=""
+         />
+
+        <div className={styles.container}>
+          <div className={styles.header} > 
+            <h3 className={styles.title}>{issue.name}</h3>
+            <div className={styles.statusBadge} style={{backgroundColor: issue.isOpen ? 'green' : 'red' }}>
+              <p className={styles.statusText}>{issue.isOpen ? "Open" : "Closed"}</p>
+            </div>
+            <div>
+              <a href='#' style={{fontStyle: 'italic'}} onClick={() => setModalOpen(true)}>Submit an article.</a>
+            </div>
+          </div>
+    
+          <div className={styles.articlesRow}>
+            {articles.length === 0 && <p>No articles yet.</p>}
+            {articles.map((article, i) => (
+              <div key={i}>
+                <ArticleCard article={article} />
+              </div>
+            ))}
           </div>
         </div>
-  
-        <div className={styles.articlesRow}>
-          {articles.length === 0 && <p>No articles yet.</p>}
-          {articles.map((article, i) => (
-            <div key={i}>
-              <ArticleCard article={article} />
-            </div>
-          ))}
-        </div>
-      </div>
+      </>
     );
 }
 

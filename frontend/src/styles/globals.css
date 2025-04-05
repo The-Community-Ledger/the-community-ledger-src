@@ -139,3 +139,7 @@ button {
   font-family: 'Nanum Myeongjo', serif;
   font-weight: 800;
 }
+
+.w-md-editor-fullscreen {
+  position: absolute !important; 
+}
