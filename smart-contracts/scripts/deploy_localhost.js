@@ -43,30 +43,32 @@ async function main() {
   await journalCore.waitForDeployment(); // Wait for the deployment to complete
   console.log("JournalCore deployed to:", journalCore.target); // Log the deployed address of JournalCore
 
-  /**
-   * Deploy the JournalIssue contract
-   * @dev This contract is used to manage individual journal issues.
-   */
-  const issueName = "Advances"; // Name of the journal issue
-  const descriptionIpfsHash = "QmSampleHash"; // IPFS hash for the issue description
-  const descriptionContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Content')); // Hash of the issue content
-  const durationDays = 10000000; // Duration of the journal issue in days
-  const articleStakeRequired = ethers.parseEther("10"); // Stake required for submitting an article
+  // Deploy an example of the JournalIssue/Article/Review contracts
 
-  // Deploy the JournalIssue contract with the specified parameters
-  const JournalIssue = await ethers.getContractFactory("JournalIssue"); // Get the contract factory for JournalIssue
-  const journalIssue = await JournalIssue.deploy(
-    0,
-    issueName,
-    descriptionIpfsHash,
-    descriptionContentHash,
-    journalCredit.target,
-    durationDays,
-    articleStakeRequired, 
-    articleFactory.target,
-  );
-  await journalIssue.waitForDeployment(); // Wait for the deployment to complete
-  console.log("JournalIssue deployed to:", journalIssue.target); // Log the deployed address of JournalIssue
+  // /**
+  //  * Deploy the JournalIssue contract
+  //  * @dev This contract is used to manage individual journal issues.
+  //  */
+  // const issueName = "Advances"; // Name of the journal issue
+  // const descriptionIpfsHash = "QmSampleHash"; // IPFS hash for the issue description
+  // const descriptionContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Content')); // Hash of the issue content
+  // const durationDays = 10000000; // Duration of the journal issue in days
+  // const articleStakeRequired = ethers.parseEther("10"); // Stake required for submitting an article
+
+  // // Deploy the JournalIssue contract with the specified parameters
+  // const JournalIssue = await ethers.getContractFactory("JournalIssue"); // Get the contract factory for JournalIssue
+  // const journalIssue = await JournalIssue.deploy(
+  //   0,
+  //   issueName,
+  //   descriptionIpfsHash,
+  //   descriptionContentHash,
+  //   journalCredit.target,
+  //   durationDays,
+  //   articleStakeRequired, 
+  //   articleFactory.target,
+  // );
+  // await journalIssue.waitForDeployment(); // Wait for the deployment to complete
+  // console.log("JournalIssue deployed to:", journalIssue.target); // Log the deployed address of JournalIssue
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -18,8 +18,7 @@ contract JournalIssueFactory {
             string calldata descriptionIpfsHash, 
             bytes32 descriptionContentHash, 
             uint256 durationDays,
-            uint256 articleStakeRequired,
-            address articleFactory
+            uint256 articleStakeRequired
         ) external returns (address) {
         JournalIssue issue = new JournalIssue(
             issueId,

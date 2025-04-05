@@ -49,13 +49,27 @@ export const useSmartContract = () => {
         return smartContract;
     }
 
+    const getSmartContractFromAddress = (name, address) => {
+        const smartContractData = contractsData[name];
+        if (!smartContractData || !ethersProvider || !ethersSigner) return null;
+
+        const smartContract = new ethers.Contract(
+            address,
+            smartContractData.abi,
+            ethersSigner
+        );
+
+        return smartContract;
+    }
+
     return {
         // Data
         deployedNetworkData,
 
         // Methods
         getSmartContract,
-        getAllSmartContractNames
+        getAllSmartContractNames,
+        getSmartContractFromAddress
     }
 }
 
