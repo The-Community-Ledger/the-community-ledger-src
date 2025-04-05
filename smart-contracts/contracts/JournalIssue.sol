@@ -81,8 +81,8 @@ contract JournalIssue {
     }
 
     // Function to get the details of the issue
-    function getIssueDetails() external view returns (uint256, address, string memory, string memory, uint256) {
-        return (issueId, issueOwner, issueName, descriptionIpfsHash, articleStakeRequired);
+    function getIssueDetails() external view returns (uint256, address, string memory, string memory, uint256, uint256, uint256, bool) {
+        return (issueId, issueOwner, issueName, descriptionIpfsHash, articleStakeRequired, issueOpenTime, issueCloseTime, block.timestamp < issueCloseTime);
     }
 
     // Function to get all articles submitted to the issue

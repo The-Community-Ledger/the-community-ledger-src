@@ -2,7 +2,7 @@
 // Resolves an article from its CID, check the content, display
 function ArticleCard({ article }) {
     return ( 
-        <div style={{ border: "1px solid black", padding: "1rem", minWidth: "500px", height: "500px" }}>
+        <div style={{ padding: "1rem", minWidth: "450px", height: "450px", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)", }}>
             <p>{ article?.ipfsHash }</p>
         </div>
      );

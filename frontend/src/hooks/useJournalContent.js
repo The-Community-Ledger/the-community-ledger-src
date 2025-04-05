@@ -24,7 +24,10 @@ export function useJournalContent() {
                 owner: issueData[1],
                 name: issueData[2],
                 descriptionIpfsHash: issueData[3],
-                articleStakeRequired: issueData[4]
+                articleStakeRequired: issueData[4],
+                issueOpenTime: issueData[5],
+                issueCloseTime: issueData[6],
+                isOpen: issueData[7],
             };
         }));
         console.log("Fetched issues:", issues);
