@@ -44,16 +44,14 @@ contract JournalIssue {
         descriptionContentHash = _descriptionContentHash;
     }
 
-    function isOpen() external view returns (bool) {
-        return block.timestamp < issueCloseTime;
-    }
-
     function submitArticle(string calldata _ipfsHash, bytes32 _contentHash) external {
         require(block.timestamp < issueCloseTime, "Issue is closed");
         require(jcrToken.balanceOf(msg.sender) >= articleStakeRequired, "Insufficient JCR balance");
         require(jcrToken.allowance(msg.sender, address(this)) >= articleStakeRequired, "JCR allowance not set");
 
         jcrToken.transferFrom(msg.sender, address(this), articleStakeRequired);
+
+        nextArticleId++;
 
         articles.push(Article({
             id: nextArticleId,
@@ -63,8 +61,64 @@ contract JournalIssue {
             stakeAmount: articleStakeRequired
         }));
 
-        nextArticleId++;
         emit ArticleSubmitted(nextArticleId, _ipfsHash, msg.sender);
-        
+    }
+
+    function isOpen() external view returns (bool) {
+        return block.timestamp < issueCloseTime;
+    }
+
+    function getArticles() external view returns (Article[] memory) {
+        return articles;
+    }
+
+    function getArticle(uint256 _articleId) external view returns (Article memory) {
+        require(_articleId < nextArticleId, "Invalid article ID");
+        return articles[_articleId];
+    }
+
+    function getIssueDetails() external view returns (
+        string memory,
+        string memory,
+        bytes32,
+        address,
+        uint256,
+        uint256,
+        uint256
+    ) {
+        return (
+            issueName,
+            descriptionIpfsHash,
+            descriptionContentHash,
+            issueOwner,
+            issueOpenTime,
+            issueCloseTime,
+            articleStakeRequired
+        );
+    }
+
+    function getIssueName() external view returns (string memory) {
+        return issueName;
+    }
+    function getDescriptionIpfsHash() external view returns (string memory) {
+        return descriptionIpfsHash;
+    }
+    function getDescriptionContentHash() external view returns (bytes32) {
+        return descriptionContentHash;
+    }
+    function getIssueOwner() external view returns (address) {
+        return issueOwner;
+    }
+    function getIssueOpenTime() external view returns (uint256) {
+        return issueOpenTime;
+    }
+    function getIssueCloseTime() external view returns (uint256) {
+        return issueCloseTime;
+    }
+    function getArticleStakeRequired() external view returns (uint256) {
+        return articleStakeRequired;
+    }
+    function getArticleCount() external view returns (uint256) {
+        return articles.length;
     }
 }
