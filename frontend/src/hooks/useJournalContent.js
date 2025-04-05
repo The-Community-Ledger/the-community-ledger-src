@@ -1,8 +1,9 @@
+import { useEffect } from "react";
 import { useSmartContract } from "./useSmartContract";
 
 
 export function useJournalContent() {
-    const { getSmartContract, getSmartContractFromAddress } = useSmartContract();
+    const { getSmartContract, getSmartContractFromAddress } = useSmartContract();        
 
     const fetchIssues = async () => {
         const journalCoreContract = getSmartContract("JOURNALCORE");
@@ -34,7 +35,7 @@ export function useJournalContent() {
         const articlesAddresses = await issue.contract.getArticles();
         console.log("Fetched articles addresses:", articlesAddresses);
         const articles = await Promise.all(articlesAddresses.map(async (articleAddress) => {
-            const articleContract = getSmartConstractFromAddress("ARTICLE", articleAddress);
+            const articleContract = getSmartContractFromAddress("ARTICLE", articleAddress);
             if (!articleContract) return null;
             console.log("Fetching article data from contract at address:", articleAddress);
             const articleData = await articleContract.getArticleDetails();
@@ -56,7 +57,7 @@ export function useJournalContent() {
         const reviewsAddresses = await article.contract.getReviews();
         console.log("Fetched reviews addresses:", reviewsAddresses);
         const reviews = await Promise.all(reviewsAddresses.map(async (reviewAddress) => {
-            const reviewContract = getSmartConstractFromAddress("REVIEW", reviewAddress);
+            const reviewContract = getSmartContractFromAddress("REVIEW", reviewAddress);
             if (!reviewContract) return null;
             console.log("Fetching review data from contract at address:", reviewAddress);
             const reviewData = await reviewContract.getReviewDetails();

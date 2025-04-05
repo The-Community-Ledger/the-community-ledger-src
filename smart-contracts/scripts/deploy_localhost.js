@@ -71,23 +71,29 @@ async function main() {
       }
     })
     .find(parsed => parsed && parsed.name === "IssueOpened");
-
   if (!event) {
     throw new Error("IssueOpened event not found in transaction logs");
   }
-
   const issueAddress = ethers.getAddress(event.args.issueAddress);
   console.log("New JournalIssue contract deployed at:", issueAddress);
+  
+  const JournalIssue = await ethers.getContractFactory("JournalIssue"); // Get the contract factory for JournalIssue
+  const journalIssue = await JournalIssue.attach(issueAddress); // Attach to the deployed JournalIssue contract
 
   /** 
    * Deploy several sample Article contracts
    */
-  const articleId = 1; // ID of the article
-  const articleIpfsHash = "QmSampleArticleHash"; // IPFS hash for the article
-  const articleContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Article Content')); // Hash of the article content
-  const articleStake = ethers.parseEther("10"); // Stake required for submitting the article
-  const articleAuthor = ethers.getAddress("0x1234567890123456789012345678901234567890"); // Author of the article
-  await articleFactory.createArticle(articleId, articleAuthor, articleIpfsHash, articleContentHash, articleStake, issueAddress); // Create a new article
+  journalCredit.approve(journalIssue.target, ethers.parseEther("10000")); // Approve the JournalCore contract to spend the journal credit
+  for (let i = 0; i < 10; i++) {
+    // const articleId = i; // ID of the article
+    const articleIpfsHash = "QmSampleArticleHash" + i; // IPFS hash for the article
+    const articleContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Article Number ' + i)); // Hash of the article content
+    // const articleStake = ethers.parseEther("10"); // Stake required for submitting the article
+    // const articleAuthor = ethers.getAddress("0x1234567890123456789012345678901234567890"); // Author of the article
+    await journalIssue.submitArticle(articleIpfsHash, articleContentHash); // Create a new article
+
+    console.log("Article created: Sample Article Number ", i); // Log the ID of the created article
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere

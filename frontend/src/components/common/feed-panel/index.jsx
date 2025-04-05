@@ -8,6 +8,7 @@ function FeedPanel() {
     const { fetchIssues } = useJournalContent()
     const [ issues, setIssues ] = useState([]);
     const { walletConnectionStatus } = useWallet();
+    const { contractData } = useWallet();
 
     useEffect(() => {
         const _fetchIssues = async () => {
