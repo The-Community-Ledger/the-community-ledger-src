@@ -32,7 +32,7 @@ contract JournalIssue {
     Article[] public articles; // Array to store submitted articles
 
     // Event emitted when an article is submitted
-    event ArticleSubmitted(uint256 indexed articleId, string ipfsHash, address submitter);
+    event ArticleSubmitted(uint256 indexed articleId, string ipfsHash, address articleAdress);
 
     // Constructor to initialize the journal issue
     constructor(
@@ -71,11 +71,12 @@ contract JournalIssue {
             msg.sender,
             _ipfsHash,
             _contentHash,
-            articleStakeRequired
+            articleStakeRequired,
+            address(this) // Pass the address of the parent issue
         );
         articles.push(article); // Store the article in the array
 
-        emit ArticleSubmitted(nextArticleId, _ipfsHash, msg.sender); // Emit the submission event
+        emit ArticleSubmitted(nextArticleId, _ipfsHash, address(article)); // Emit the submission event
     }
 
     // Function to check if the issue is still open

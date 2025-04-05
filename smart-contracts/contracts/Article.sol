@@ -7,6 +7,7 @@ contract Article {
     string public ipfsHash; // IPFS hash of the article
     bytes32 public contentHash; // Hash of the article content for verification
     uint256 public stakeAmount; // Amount of JCR tokens staked for the article
+    address public parentIssue; // Address of the parent issue
 
     // Constructor to initialize the article
     constructor(
@@ -14,13 +15,20 @@ contract Article {
         address _submitter,
         string memory _ipfsHash,
         bytes32 _contentHash,
-        uint256 _stakeAmount
+        uint256 _stakeAmount, 
+        address _parentIssue
     ) {
         id = _id; // Set the article ID
         submitter = _submitter; // Set the submitter's address
         ipfsHash = _ipfsHash; // Set the IPFS hash
         contentHash = _contentHash; // Set the content hash
         stakeAmount = _stakeAmount; // Set the stake amount
+        parentIssue = _parentIssue; // Set the parent issue address
+    }
+
+    // Function to submit a review for the article
+    function submitReview(string calldata _ipfsHash, bytes32 _contentHash) external {
+
     }
 
     // Function to get the article details
