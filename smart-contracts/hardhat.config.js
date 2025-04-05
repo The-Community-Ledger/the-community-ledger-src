@@ -6,7 +6,14 @@ dotenv.config({ path: "./.env" });
 
 /** @type import('hardhat/config').HardhatUserConfig */
 const config = {
-  solidity: "0.8.21",
+  solidity: {
+    version: "0.8.21",
+    settings: {
+    optimizer: {
+      enabled: true,
+      runs: 50 // lower = smaller contract size, higher = cheaper runtime gas
+    }
+  }},
   networks: {
     hardhat: {
       loggingEnabled: false
