@@ -44,6 +44,40 @@ export function JournalFeedProvider({ children }) {
     }
     , [walletConnectionStatus, contractsData]);
 
+    useEffect(() => {
+        const fetchArticlesForIssue = async (issue) => {
+            const articlesAddresses = await issue.contract.getArticles();
+            console.log("Fetched articles addresses:", articlesAddresses);
+            const articles = await Promise.all(articlesAddresses.map(async (articleAddress) => {
+                const articleContract = getSmartContractFromAddress("ARTICLE", articleAddress);
+                if (!articleContract) return null;
+                console.log("Fetching article data from contract at address:", articleAddress);
+                const articleData = await articleContract.getArticleDetails();
+                console.log("Fetched article data:", articleData);
+                return {
+                    address: articleAddress,
+                    contract: articleContract,
+                    id: articleData[0],
+                    owner: articleData[1],
+                    name: articleData[2],
+                    descriptionIpfsHash: articleData[3],
+                    contentHash: articleData[4]
+                };
+            }));
+            console.log("Fetched articles:", articles);
+            issue.articles = articles;
+            return issue;
+        }
+        const fetchAllArticles = async () => {
+            const issuesWithArticles = await Promise.all(issues.map(fetchArticlesForIssue));
+            setIssues(issuesWithArticles);
+        }
+        if (issues.length > 0) {
+            fetchAllArticles();
+        }
+    }
+    , [issues]);
+
 
 
     return (

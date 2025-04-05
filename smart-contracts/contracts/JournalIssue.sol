@@ -84,4 +84,13 @@ contract JournalIssue {
     function getIssueDetails() external view returns (uint256, address, string memory, string memory, uint256) {
         return (issueId, issueOwner, issueName, descriptionIpfsHash, articleStakeRequired);
     }
+
+    // Function to get all articles submitted to the issue
+    function getArticles() external view returns (address[] memory) {
+        address[] memory articleAddresses = new address[](articles.length);
+        for (uint256 i = 0; i < articles.length; i++) {
+            articleAddresses[i] = address(articles[i]);
+        }
+        return articleAddresses;
+    }
 }

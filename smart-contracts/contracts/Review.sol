@@ -68,4 +68,13 @@ contract Review {
         return address(parentArticle); // Return the parent article address
     }
 
+    function getReviewDetails() external view returns (uint256, address, string memory, bytes32, bool) {
+        return (id, reviewer, ipfsHash, contentHash, isChallenged); // Return the review details
+    }
+    function getChallengeDetails() external view returns (address, string memory, bytes32) {
+        require(isChallenged, "Review is not challenged"); // Ensure the review is challenged
+        return (challenge.challenger, challenge.ipfsHash, challenge.contentHash); // Return the challenge details
+    }
+
+
 }
