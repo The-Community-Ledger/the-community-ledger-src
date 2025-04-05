@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useIpfsStore } from "@/hooks/useIpfsStore";
 import { useWallet } from "@/hooks/useWallet";
+import MDEditor from "@uiw/react-md-editor";
+
 
 // Resolves an article from its CID, check the content, display
 function ArticleCard({ article }) {
@@ -38,7 +40,7 @@ function ArticleCard({ article }) {
 
     return ( 
         <div style={{ padding: "1rem", minWidth: "450px", height: "450px", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)", }}>
-            { content && <p>{ content }</p> }
+            { content && <MDEditor.Markdown source={ content } /> }
             { isLoading && <p>Loading...</p> }
             { error && <p>Error: {error.message}</p> }
         </div>
