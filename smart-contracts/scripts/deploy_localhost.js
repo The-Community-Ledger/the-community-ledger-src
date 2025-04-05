@@ -16,28 +16,38 @@ async function main() {
   console.log("JournalCredit deployed to:", journalCredit.target); // Log the deployed address of JournalCredit
 
   /**
+   * Deploy the JournalCore contract
+   * @dev This contract is used to manage the core functionalities of the journal.
+   */
+  const issueStakeRequired = ethers.parseEther("1000"); // Set the issue stake required to 10 tokens
+  const JournalCore = await ethers.getContractFactory("JournalCore"); // Get the contract factory for JournalCore
+  const journalCore = await JournalCore.deploy(journalCredit.target, issueStakeRequired); // Deploy the JournalCore contract with the wall contract address
+  await journalCore.waitForDeployment(); // Wait for the deployment to complete
+  console.log("JournalCore deployed to:", journalCore.target); // Log the deployed address of JournalCore
+
+  /**
    * Deploy the JournalIssue contract
    * @dev This contract is used to manage individual journal issues.
    */
-  const JournalIssue = await ethers.getContractFactory("JournalIssue"); // Get the contract factory for JournalIssue
-  const issueName = "Sample Issue"; // Name of the journal issue
+  const issueName = "Advances"; // Name of the journal issue
   const descriptionIpfsHash = "QmSampleHash"; // IPFS hash for the issue description
   const descriptionContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Content')); // Hash of the issue content
-  const jcrToken = journalCredit.target; // Address of the JournalCredit token contract
-  const durationDays = 30; // Duration of the journal issue in days
+  const durationDays = 10000000; // Duration of the journal issue in days
   const articleStakeRequired = ethers.parseEther("10"); // Stake required for submitting an article
 
   // Deploy the JournalIssue contract with the specified parameters
+  const JournalIssue = await ethers.getContractFactory("JournalIssue"); // Get the contract factory for JournalIssue
   const journalIssue = await JournalIssue.deploy(
+    0,
     issueName,
     descriptionIpfsHash,
     descriptionContentHash,
-    jcrToken,
+    journalCredit.target,
     durationDays,
     articleStakeRequired
   );
   await journalIssue.waitForDeployment(); // Wait for the deployment to complete
-  console.log("JournalIssue deployed to:", journalIssue.target); // Log the deployed address of JournalIssue
+  console.log("JournalIssue deployed to:", sampleIssue); // Log the deployed address of JournalIssue
 }
 
 // We recommend this pattern to be able to use async/await everywhere

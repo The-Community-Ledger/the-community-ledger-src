@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.21;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./JournalIssue.sol";
+
 
 contract JournalCore {
     address public owner;
-    address public jcrToken;
+    IERC20 public jcrToken;
     uint256 public issueStakeRequired;
 
     JournalIssue[] public issues;
@@ -14,9 +16,8 @@ contract JournalCore {
 
     constructor(address _jcrToken, uint256 _issueStakeRequired) {
         owner = msg.sender;
-        jcrToken = _jcrToken;
+        jcrToken = IERC20(_jcrToken);
         issueStakeRequired = _issueStakeRequired;
-        issueDurationDays = _issueDurationDays;
     }
 
     function openIssue(    
@@ -37,7 +38,7 @@ contract JournalCore {
             issueName,
             descriptionIpfsHash,
             descriptionContentHash,
-            jcrToken,
+            address(jcrToken),
             durationDays,
             articleStakeRequired
         );
