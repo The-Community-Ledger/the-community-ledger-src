@@ -4,7 +4,8 @@ import Link from "next/link";
 
 function Header() {
     return ( 
-        <header style={{ display: 'flex', flexDirection: 'column' }}>
+        <header style={{ display: 'flex', flexDirection: 'column', position:"fixed", backgroundColor: "white", boxShadow: "0 4px 4px rgba(0, 0, 0, 0.05)",
+             width: '100%', top:0, zIndex: 1000 }}>
             <div
                 style={{
                 display: 'flex',

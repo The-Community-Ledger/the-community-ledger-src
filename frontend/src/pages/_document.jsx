@@ -7,6 +7,7 @@ export default function Document() {
       <Head />
       <body>
         <Header />
+        <div style={{ height: '100px'}}></div>
         <Main />
         <NextScript />
       </body>

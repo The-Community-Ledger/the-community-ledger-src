@@ -25,7 +25,7 @@ function FeedPanel() {
 
     return ( 
         <div style={{ display: "flex", flexDirection: "column", gap: "2rem", alignItems: "space-around"}}>
-            <h2 style={{paddingLeft: "2rem", fontFamily: "Gloock", }} >Issues:</h2>
+            {/* <h2 style={{paddingLeft: "7rem", fontFamily: "Gloock", fontSize: "1.8rem"}} >Issues:</h2> */}
             {issues.length == 0 && <p>No issues to display.</p>}
             {issues.map((issue, i) => <IssuePanel key={i} issue={issue} />)}
         </div>
