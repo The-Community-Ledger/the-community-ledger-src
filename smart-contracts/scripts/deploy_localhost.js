@@ -140,7 +140,7 @@ async function createIssue(issueName, journalCredit, journalCore) {
    * Deploy several sample Article contracts
    */
   journalCredit.approve(journalIssue.target, ethers.parseEther("10000")); // Approve the JournalCore contract to spend the journal credit
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 6; i++) {
     // const articleId = i; // ID of the article
     const articleIpfsHash = "QmSampleArticleHash" + i; // IPFS hash for the article
     const articleContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Article Number ' + i)); // Hash of the article content

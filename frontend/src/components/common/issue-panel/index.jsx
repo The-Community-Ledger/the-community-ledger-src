@@ -5,6 +5,7 @@ import { useWallet } from "@/hooks/useWallet";
 import styles from "./style.module.css";
 import { useIpfsStore } from "@/hooks/useIpfsStore";
 import MarkdownModal from "../markdown-modal";
+import { ethers } from "ethers";
 
 
 // Checks issue, display its content as articles
@@ -17,7 +18,6 @@ function IssuePanel({ issue }) {
     const [ submitError, setSubmitError ] = useState('');
     const [ isLoading, setIsLoading ] = useState(false);
     const [ isSubmitted, setIsSubmitted ] = useState(false);
-    const [ submittedContent, setSubmittedContent ] = useState("");
 
     // Fetch articles for the issue
     useEffect(() => {
@@ -34,17 +34,50 @@ function IssuePanel({ issue }) {
 
     // Handle markdown submit
     const handleSubmit = async (md) => {
+        if (!md) {
+            setSubmitError("Empty content.");
+            return;
+        }
         console.log("Submitting markdown:", md);
         setIsLoading(true);
+        setSubmitError("");
+        let cid; 
         try {
-            const cid = await storeIpfsData({ content: md });
+            cid = await storeIpfsData({ content: md });
+            if (!cid) {
+                setSubmitError("Error storing IPFS data.");
+                return;
+            }
+            const data = await fetchIpfsData(cid);
+            if (!data) {
+                setSubmitError("Error fetching IPFS data.");
+                return;
+            }
             console.log("Stored IPFS data with CID:", cid);
-            setIsSubmitted(true);
-            setSubmitError('');
-        } catch (error) {
-            setSubmitError("Error storing IPFS data:", error);
+          } catch (error) {
+            console.error("Error storing IPFS data:", error);
+            setSubmitError("Error storing IPFS data.");
+            setIsLoading(false);
+            return;
         }
-        setIsLoading(false);
+        try {// Store data on chain
+
+            // Step 1: Convert JSON to string
+            const jsonString = JSON.stringify(md);
+            
+            // Step 2: Hash it with keccak256 to get bytes32
+            const contentHash = ethers.keccak256(ethers.toUtf8Bytes(jsonString));
+            
+            // Step 3: Call the submitArticle function
+            console.log("Submitting article to contract:", issue.contract);
+            const submitTx = await issue.contract.submitArticle(cid, contentHash);
+            console.log("Transaction submitted:", submitTx);
+            setIsSubmitted(true);
+        } catch (error) {
+            console.error("Error submitting article:", error);
+            setSubmitError("Error submitting article.");
+        }   
+       setIsLoading(false);
     }
 
     return (
@@ -67,7 +100,8 @@ function IssuePanel({ issue }) {
               <p className={styles.statusText}>{issue.isOpen ? "Open" : "Closed"}</p>
             </div>
             <div>
-              <a href='#' style={{fontStyle: 'italic'}} onClick={() => setModalOpen(true)}>Submit an article.</a>
+              { !isSubmitted && <a href='#' style={{fontStyle: 'italic'}} onClick={() => setModalOpen(true)}>Submit an article.</a> }
+              { isSubmitted && <p style={{fontStyle: 'italic'}}>Article submitted.</p> }
             </div>
           </div>
     

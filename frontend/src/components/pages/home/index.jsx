@@ -3,13 +3,13 @@ import styles from "./styles.module.css";
 import { useWallet } from "@/hooks/useWallet";
 import InfoSection from "./info-section";
 import WallSection from "./wall-section";
-import { useIpfsStorage } from "@/hooks/useIpfsStore";
+import { useIpfsStore } from "@/hooks/useIpfsStore";
 import { useEffect } from "react";
 
 export default function Home() {
     const { walletConnectionStatus } = useWallet();
         
-    const { fetchIpfsData, storeIpfsData } = useIpfsStorage();
+    const { fetchIpfsData, storeIpfsData } = useIpfsStore();
 
     // Example usage of fetchIpfsData
     useEffect(() => {

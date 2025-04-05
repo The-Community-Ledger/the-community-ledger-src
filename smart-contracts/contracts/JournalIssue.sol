@@ -4,9 +4,11 @@ pragma solidity ^0.8.21;
 // Importing the IERC20 interface from OpenZeppelin for ERC20 token interactions
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IArticleFactory } from "./ArticleFactory.sol";
+import { console } from "hardhat/console.sol";
 
-interface IArticle {}
-
+interface IArticle {
+    function getSubmitter() external view returns (address);
+}
 
 // Contract for managing a journal issue
 contract JournalIssue {
@@ -71,7 +73,7 @@ contract JournalIssue {
             address(this) // Pass the address of the parent issue
         );
         articles.push(IArticle(articleAddress)); // Store the article in the array
-
+        console.log("Article submitted:", articleAddress); // Log the article submission
         emit ArticleSubmitted(articleAddress); // Emit the submission event
     }
 

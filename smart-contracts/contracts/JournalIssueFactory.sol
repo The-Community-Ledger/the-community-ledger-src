@@ -7,8 +7,6 @@ contract JournalIssueFactory {
     address public jcrToken;
     address public articleFactory;
 
-    event IssueCreated(address indexed issueAddress);
-
     constructor(address _jcrToken, address _articleFactory) {
         jcrToken = _jcrToken;
         articleFactory = _articleFactory;
@@ -32,7 +30,6 @@ contract JournalIssueFactory {
             articleStakeRequired,
             articleFactory
         );
-        emit IssueCreated(address(issue));
         return address(issue);
     }
 }

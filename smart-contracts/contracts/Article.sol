@@ -55,6 +55,11 @@ contract Article {
         return address(parentIssue); // Return the parent issue address
     }
 
+    // Function to get the submitter's address
+    function getSubmitter() external view returns (address) {
+        return submitter; // Return the submitter's address
+    }
+
     // Function to get the article details
     function getArticleDetails() external view returns (uint256, address, string memory, bytes32) {
         return (id, submitter, ipfsHash, contentHash); // Return the article details

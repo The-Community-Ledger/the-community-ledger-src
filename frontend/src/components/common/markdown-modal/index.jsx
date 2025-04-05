@@ -48,7 +48,7 @@ const buttonStyle = {
   cursor: 'pointer',
 };
 
-const cancelButtonStyle = {
+const closeButtonStyle = {
   ...buttonStyle,
   backgroundColor: '#e2e8f0',
   color: '#000',
@@ -101,8 +101,8 @@ const MarkdownModal = ({
         <MDEditor value={markdown} onChange={setMarkdown} height={'600px'} previewOptions={{rehypePlugins: [[rehypeSanitize]],}} />
 
         <div style={buttonRowStyle}>
-          <button style={cancelButtonStyle} onClick={onClose} disabled={isLoading}>
-            Cancel
+          <button style={closeButtonStyle} onClick={onClose} disabled={isLoading}>
+            Close
           </button>
           {!isSubmitted &&
             <button style={submitButtonStyle} onClick={() => onSubmit(markdown)} disabled={isLoading || isSubmitted}>
