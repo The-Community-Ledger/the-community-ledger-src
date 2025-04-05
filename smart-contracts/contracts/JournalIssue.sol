@@ -8,15 +8,6 @@ import "./Article.sol";
 
 // Contract for managing a journal issue
 contract JournalIssue {
-    // Struct to represent an article submitted to the journal
-    // struct Article {
-    //     uint256 id; // Unique ID of the article
-    //     address submitter; // Address of the author
-    //     string ipfsHash; // IPFS hash of the article
-    //     bytes32 contentHash; // Hash of the article content for verification
-    //     uint256 stakeAmount; // Amount of JCR tokens staked for the article
-    // }
-
     // State variables
     uint256 public issueId; // Unique ID of the journal issue
     IERC20 public jcrToken; // ERC20 token used for staking
