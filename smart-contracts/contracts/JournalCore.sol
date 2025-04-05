@@ -55,4 +55,12 @@ contract JournalCore {
         require(index < issues.length, "Invalid issue index");
         return address(issues[index]);
     }
+
+    function getIssues() external view returns (JournalIssue[] memory) {
+        return issues;
+    }
+
+    function getIssueStakeRequired() external view returns (uint256) {
+        return issueStakeRequired;
+    }
 }

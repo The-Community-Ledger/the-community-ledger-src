@@ -4,16 +4,18 @@ pragma solidity ^0.8.21;
 // Importing the IERC20 interface from OpenZeppelin for ERC20 token interactions
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+import "./Article.sol";
+
 // Contract for managing a journal issue
 contract JournalIssue {
     // Struct to represent an article submitted to the journal
-    struct Article {
-        uint256 id; // Unique ID of the article
-        address submitter; // Address of the author
-        string ipfsHash; // IPFS hash of the article
-        bytes32 contentHash; // Hash of the article content for verification
-        uint256 stakeAmount; // Amount of JCR tokens staked for the article
-    }
+    // struct Article {
+    //     uint256 id; // Unique ID of the article
+    //     address submitter; // Address of the author
+    //     string ipfsHash; // IPFS hash of the article
+    //     bytes32 contentHash; // Hash of the article content for verification
+    //     uint256 stakeAmount; // Amount of JCR tokens staked for the article
+    // }
 
     // State variables
     uint256 public issueId; // Unique ID of the journal issue
@@ -64,13 +66,14 @@ contract JournalIssue {
         nextArticleId++; // Increment the article ID counter
 
         // Add the article to the list
-        articles.push(Article({
-            id: nextArticleId,
-            submitter: msg.sender,
-            ipfsHash: _ipfsHash,
-            contentHash: _contentHash,
-            stakeAmount: articleStakeRequired
-        }));
+        Article article = new Article(
+            nextArticleId,
+            msg.sender,
+            _ipfsHash,
+            _contentHash,
+            articleStakeRequired
+        );
+        articles.push(article); // Store the article in the array
 
         emit ArticleSubmitted(nextArticleId, _ipfsHash, msg.sender); // Emit the submission event
     }
@@ -86,7 +89,7 @@ contract JournalIssue {
     }
 
     // Function to get details of a specific article by ID
-    function getArticle(uint256 _articleId) external view returns (Article memory) {
+    function getArticle(uint256 _articleId) external view returns (Article) {
         require(_articleId < nextArticleId, "Invalid article ID"); // Ensure the article ID is valid
         return articles[_articleId];
     }
