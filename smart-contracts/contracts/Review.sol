@@ -1,13 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.21;
 
+interface IArticle {
+    function getParentIssue() external view returns (IIssue);
+}
+
+interface IIssue {
+    function isOpen() external view returns (bool);
+}
+
 contract Review {
     uint256 public id; // Unique ID of the review
     address public reviewer; // Address of the reviewer
     string public ipfsHash; // IPFS hash of the review
     bytes32 public contentHash; // Hash of the review content for verification
     uint256 public stakeAmount; // Amount of JCR tokens staked for the review
-    address public parentArticle; // Address of the parent article
+    IArticle public parentArticle; // Address of the parent article
 
     struct Challenge {
         address challenger; // Address of the challenger
@@ -35,7 +43,7 @@ contract Review {
         ipfsHash = _ipfsHash; // Set the IPFS hash
         contentHash = _contentHash; // Set the content hash
         stakeAmount = _stakeAmount; // Set the stake amount
-        parentArticle = _parentArticle; // Set the parent article address
+        parentArticle = IArticle(_parentArticle); // Set the parent article address
         challenge = Challenge(address(0), "", "", 0); // Initialize the challenge struct
         isChallenged = false; // Set the challenge flag to false
     }
@@ -48,7 +56,7 @@ contract Review {
         uint256 _stakeAmount
     ) external {
         require(!isChallenged, "Review is already challenged"); // Ensure the review is not already challenged
-        require(parentArticle.parentIssue.isOpen(), "Issue is closed"); // Ensure the parent issue is open
+        require(parentArticle.getParentIssue().isOpen(), "Issue is closed"); // Ensure the parent issue is open
 
         challenge = Challenge(_challenger, _ipfsHash, _contentHash, _stakeAmount); // Set the challenge details
         isChallenged = true; // Set the challenge flag to true
@@ -87,7 +95,7 @@ contract Review {
     }
     // Function to get the parent article address
     function getParentArticle() external view returns (address) {
-        return parentArticle; // Return the parent article address
+        return address(parentArticle); // Return the parent article address
     }
 
 }

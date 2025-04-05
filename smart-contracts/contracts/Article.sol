@@ -9,11 +9,14 @@ contract Article {
     string public ipfsHash; // IPFS hash of the article
     bytes32 public contentHash; // Hash of the article content for verification
     uint256 public stakeAmount; // Amount of JCR tokens staked for the article
-    address public parentIssue; // Address of the parent issue
+    IIssue public parentIssue; // Address of the parent issue
+    
+    // Event emitted when a review is submitted
+    event ReviewSubmitted(uint256 indexed articleId, string ipfsHash, address reviewAddress);
 
     // Constructor to initialize the article
     constructor(
-        uint256 _id,
+        uint256 _id, 
         address _submitter,
         string memory _ipfsHash,
         bytes32 _contentHash,
@@ -25,7 +28,7 @@ contract Article {
         ipfsHash = _ipfsHash; // Set the IPFS hash
         contentHash = _contentHash; // Set the content hash
         stakeAmount = _stakeAmount; // Set the stake amount
-        parentIssue = _parentIssue; // Set the parent issue address
+        parentIssue = IIssue(_parentIssue); // Set the parent issue address
     }
 
     // Function to submit a review for the article
@@ -40,6 +43,11 @@ contract Article {
             address(this)
         ); // Create a new review instance
         emit ReviewSubmitted(id, _ipfsHash, address(review)); // Emit an event for the review submission
+    }
+
+    // Function to get the parent issue
+    function getParentIssue() external view returns (address) {
+        return address(parentIssue); // Return the parent issue address
     }
 
     // Function to get the article details
