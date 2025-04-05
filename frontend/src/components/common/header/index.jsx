@@ -4,7 +4,7 @@ import Link from "next/link";
 
 function Header() {
     return ( 
-        <header style={{ borderBottom: '1px solid #eaeaea', display: 'flex', flexDirection: 'column' }}>
+        <header style={{ display: 'flex', flexDirection: 'column' }}>
             <div
                 style={{
                 display: 'flex',
@@ -34,9 +34,9 @@ function Header() {
                 style={{
                 display: 'flex',
                 justifyContent: 'center',
+                alignContent: 'flex-start',
                 gap: '2rem',
-                padding: '0.75rem 0 1rem',
-                borderTop: '1px solid #eee',
+                padding: '0.rem 0 0rem',
                 fontSize: '1rem',
                 height: '2rem',
                 }}
@@ -60,10 +60,8 @@ function NavItem({ label, href }) {
               color: '#333',
               fontWeight: '500',
               paddingBottom: '0.25rem',
-              height: '1rem',
+              height: '1.2rem',
           }}
-          onMouseEnter={e => (e.target.style.borderBottom = '2px solid #333')}
-          onMouseLeave={e => (e.target.style.borderBottom = 'none')}
           >
           {label}
           </a>
