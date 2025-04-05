@@ -16,9 +16,16 @@ export function HeliaProvider({ children }) {
     const [dagService, setDagService] = useState(null); // State to store the DAG service
 
     useEffect(() => {
+
         // Function to initialize Helia and the DAG service
         const setup = async () => {
-            const helia = await createHelia({}); // Create a new Helia instance
+            const IDBBlockstore = (await import('blockstore-idb')).IDBBlockstore; // Import IDBBlockstore dynamically
+            const blockstore = new IDBBlockstore('.helia-store'); // use IndexedDB for block storage
+            await blockstore.open(); // Open the blockstore
+
+            const helia = await createHelia({
+                blocktore: blockstore, // Use the IDBBlockstore for storage
+            }); // Create a new Helia instance
             const dagService = dagJson(helia); // Create a DAG service using the Helia instance
 
             setHelia(helia); // Store the Helia instance in state
