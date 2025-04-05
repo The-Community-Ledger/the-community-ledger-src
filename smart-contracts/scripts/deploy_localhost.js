@@ -13,6 +13,8 @@ async function main() {
   const journalCredit = await JournalCredit.deploy(initialSupply);
   await journalCredit.waitForDeployment();
   console.log("JournalCredit deployed to:", journalCredit.target);
+
+  const JournalIssue = await ethers.getContractFactory("JournalIssue");
 }
 
 // We recommend this pattern to be able to use async/await everywhere
