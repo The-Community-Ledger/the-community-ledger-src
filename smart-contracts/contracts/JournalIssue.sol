@@ -16,6 +16,7 @@ contract JournalIssue {
     }
 
     // State variables
+    uint256 public issueId; // Unique ID of the journal issue
     IERC20 public jcrToken; // ERC20 token used for staking
     address public issueOwner; // Owner of the journal issue
     uint256 public issueOpenTime; // Timestamp when the issue was opened
@@ -33,6 +34,7 @@ contract JournalIssue {
 
     // Constructor to initialize the journal issue
     constructor(
+        uint256 _issueId,
         string memory _issueName,
         string memory _descriptionIpfsHash, 
         bytes32 _descriptionContentHash, 
@@ -41,6 +43,7 @@ contract JournalIssue {
         uint256 _articleStakeRequired
     ) {
         jcrToken = IERC20(_jcrToken); // Set the ERC20 token
+        issueId = _issueId; // Set the issue ID
         issueOwner = msg.sender; // Set the owner of the issue
         issueOpenTime = block.timestamp; // Set the opening time
         issueCloseTime = block.timestamp + (_durationDays * 1 days); // Set the closing time
