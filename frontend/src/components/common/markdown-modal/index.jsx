@@ -60,8 +60,23 @@ const submitButtonStyle = {
   color: '#fff',
 };
 
+const errorSubmitButtonStyle = {
+  ...buttonStyle,
+  backgroundColor: '#ef4444',
+  color: '#fff',
+};
+
+const submittedButtonStyle = {
+  ...buttonStyle,
+  backgroundColor: '#4ade80',
+  color: '#fff',
+};
+
 const MarkdownModal = ({
   isOpen,
+  isLoading, 
+  isSubmitted,
+  error, 
   onClose,
   onSubmit,
   title = "Write something",
@@ -86,12 +101,18 @@ const MarkdownModal = ({
         <MDEditor value={markdown} onChange={setMarkdown} height={'600px'} previewOptions={{rehypePlugins: [[rehypeSanitize]],}} />
 
         <div style={buttonRowStyle}>
-          <button style={cancelButtonStyle} onClick={onClose}>
+          <button style={cancelButtonStyle} onClick={onClose} disabled={isLoading}>
             Cancel
           </button>
-          <button style={submitButtonStyle} onClick={() => onSubmit(markdown)}>
-            Submit
-          </button>
+          {!isSubmitted &&
+            <button style={submitButtonStyle} onClick={() => onSubmit(markdown)} disabled={isLoading || isSubmitted}>
+                Submit
+            </button>}
+            {isSubmitted &&
+            <button style={submittedButtonStyle} disabled>
+                Submitted
+            </button>}
+          {error && <p style={{ color: 'red', marginTop: '8px' }}>{error}</p>}
         </div>
       </div>
     </div>

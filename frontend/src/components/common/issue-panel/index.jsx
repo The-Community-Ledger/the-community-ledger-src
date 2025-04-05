@@ -12,10 +12,14 @@ function IssuePanel({ issue }) {
     const [ articles, setArticles ] = useState([]);
     const { fetchArticlesForIssue } = useJournalContent();
     const { walletConnectionStatus } = useWallet();
-    const { fetchIpfsData } = useIpfsStore();
-    const [ description, setDescription ] = useState("");
-    const [ modalOpen, setModalOpen ] = useState(false);
+    const { fetchIpfsData, storeIpfsData } = useIpfsStore();
+    const [ modalOpen, setModalOpen ] = useState(false);    
+    const [ submitError, setSubmitError ] = useState('');
+    const [ isLoading, setIsLoading ] = useState(false);
+    const [ isSubmitted, setIsSubmitted ] = useState(false);
+    const [ submittedContent, setSubmittedContent ] = useState("");
 
+    // Fetch articles for the issue
     useEffect(() => {
         const _fetchArticles = async () => {
             const articles = await fetchArticlesForIssue(issue);
@@ -28,29 +32,30 @@ function IssuePanel({ issue }) {
         }
     }, [issue, walletConnectionStatus]);
 
-    useEffect(() => {
-      const _fetchIpfsDescription = async () => {
-        if ( issue.descriptionIpfsHash === "QmSampleHash" ) return "Sample description";
-        const data = await fetchIpfsData(issue.descriptionIpfsHash)
-        if (!data) return "Error fetching data";
-        return data.content;
-      }
-      const fetchDescription = async () => {
-        const description = await _fetchIpfsDescription();
-        setDescription(description);
-      }
-      fetchDescription();
-    }, [issue.descriptionIpfsHash]);
+    // Handle markdown submit
+    const handleSubmit = async (md) => {
+        console.log("Submitting markdown:", md);
+        setIsLoading(true);
+        try {
+            const cid = await storeIpfsData({ content: md });
+            console.log("Stored IPFS data with CID:", cid);
+            setIsSubmitted(true);
+            setSubmitError('');
+        } catch (error) {
+            setSubmitError("Error storing IPFS data:", error);
+        }
+        setIsLoading(false);
+    }
 
     return (
       <>
         <MarkdownModal
           isOpen={modalOpen}
+          isSubmitted={isSubmitted}
+          isLoading={isLoading}
+          error={submitError}
           onClose={() => setModalOpen(false)}
-          onSubmit={(md) => {
-            console.log('Submitted markdown:', md);
-            setModalOpen(false);
-          }}
+          onSubmit={handleSubmit}
           title={"Submit an article to " + issue.name}
           initialValue=""
          />
