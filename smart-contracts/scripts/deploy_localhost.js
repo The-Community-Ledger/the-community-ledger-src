@@ -46,8 +46,7 @@ async function main() {
   // Deploy an example of the JournalIssue/Article/Review contracts
 
   /**
-   * Deploy the JournalIssue contract
-   * @dev This contract is used to manage individual journal issues.
+   * Deploy a sample JournalIssue contract
    */
   const issueName = "Advances"; // Name of the journal issue
   const descriptionIpfsHash = "QmSampleHash"; // IPFS hash for the issue description
@@ -56,23 +55,39 @@ async function main() {
   const articleStakeRequired = ethers.parseEther("10"); // Stake required for submitting an article
 
   journalCredit.approve(journalCore.target, ethers.parseEther("10000")); // Approve the JournalCore contract to spend the journal credit
-  await journalCore.createIssue(issueName, descriptionIpfsHash, descriptionContentHash, durationDays, articleStakeRequired); // Create a new journal issue
+  const tx = await journalCore.createIssue(issueName, descriptionIpfsHash, descriptionContentHash, durationDays, articleStakeRequired); // Create a new journal issue
   console.log("JournalIssue created with name:", issueName); // Log the name of the created journal issue
 
-  // // Deploy the JournalIssue contract with the specified parameters
-  // const JournalIssue = await ethers.getContractFactory("JournalIssue"); // Get the contract factory for JournalIssue
-  // const journalIssue = await JournalIssue.deploy(
-  //   0,
-  //   issueName,
-  //   descriptionIpfsHash,
-  //   descriptionContentHash,
-  //   journalCredit.target,
-  //   durationDays,
-  //   articleStakeRequired, 
-  //   articleFactory.target,
-  // );
-  // await journalIssue.waitForDeployment(); // Wait for the deployment to complete
-  // console.log("JournalIssue deployed to:", journalIssue.target); // Log the deployed address of JournalIssue
+  // Wait for the transaction to be mined
+  const receipt = await tx.wait();
+
+  // Now extract the event log
+  const event = receipt.logs
+    .map(log => {
+      try {
+        return journalCore.interface.parseLog(log);
+      } catch (e) {
+        return null;
+      }
+    })
+    .find(parsed => parsed && parsed.name === "IssueOpened");
+
+  if (!event) {
+    throw new Error("IssueOpened event not found in transaction logs");
+  }
+
+  const issueAddress = ethers.getAddress(event.args.issueAddress);
+  console.log("New JournalIssue contract deployed at:", issueAddress);
+
+  /** 
+   * Deploy several sample Article contracts
+   */
+  const articleId = 1; // ID of the article
+  const articleIpfsHash = "QmSampleArticleHash"; // IPFS hash for the article
+  const articleContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Article Content')); // Hash of the article content
+  const articleStake = ethers.parseEther("10"); // Stake required for submitting the article
+  const articleAuthor = ethers.getAddress("0x1234567890123456789012345678901234567890"); // Author of the article
+  await articleFactory.createArticle(articleId, articleAuthor, articleIpfsHash, articleContentHash, articleStake, issueAddress); // Create a new article
 }
 
 // We recommend this pattern to be able to use async/await everywhere
