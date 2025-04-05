@@ -86,4 +86,10 @@ export function useJournalContent() {
         console.log("Fetched reviews:", reviews);
         return reviews;
     }
+
+    return {
+        fetchIssues,
+        fetchArticlesForIssue,
+        fetchReviewsForArticle
+    };
 }
