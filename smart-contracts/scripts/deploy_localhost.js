@@ -4,6 +4,10 @@ async function main() {
   const wallContract = await ethers.deployContract("Wall");
   await wallContract.waitForDeployment();
 
+  /**
+   * Deploy the JournalCredit contract
+   * @dev This contract is used to manage the Journal credits.
+   */
   const initialSupply = ethers.parseEther("1000000000"); // 1,000,000,000 tokens
   const JournalCredit = await ethers.getContractFactory("JournalCredit");
   const journalCredit = await JournalCredit.deploy(initialSupply);
