@@ -1,4 +1,6 @@
 const { ethers } = require("hardhat");
+const utils = require("ethers").utils;
+
 
 async function main() {
   const wallContract = await ethers.deployContract("Wall");
@@ -15,6 +17,24 @@ async function main() {
   console.log("JournalCredit deployed to:", journalCredit.target);
 
   const JournalIssue = await ethers.getContractFactory("JournalIssue");
+  const issueName = "Sample Issue";
+  const descriptionIpfsHash = "QmSampleHash";
+  const descriptionContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Content'));
+  const jcrToken = journalCredit.target;
+  const durationDays = 30;
+  const articleStakeRequired = ethers.parseEther("10");
+
+  const journalIssue = await JournalIssue.deploy(
+    issueName,
+    descriptionIpfsHash,
+    descriptionContentHash,
+    jcrToken,
+    durationDays,
+    articleStakeRequired
+  );
+  await journalIssue.waitForDeployment();
+  console.log("JournalIssue deployed to:", journalIssue.target); 
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere

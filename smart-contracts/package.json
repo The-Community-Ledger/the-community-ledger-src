@@ -8,6 +8,7 @@
     "hardhat-ethernal": "^3.2.5"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.2.0"
+    "@openzeppelin/contracts": "^5.2.0",
+    "ethers-utils": "^2.1.11"
   }
 }
