@@ -13,6 +13,8 @@ contract Article {
     IIssue public parentIssue; // Address of the parent issue
     IERC20 public jcrToken; // Address of the JCR token contract
 
+    Review[] public reviews; // Instance of the Review contract
+    mapping(address => bool) public hasReviewed; // Mapping to track if an address has reviewed
     
     // Event emitted when a review is submitted
     event ReviewSubmitted(uint256 indexed articleId, string ipfsHash, address reviewAddress);
@@ -47,7 +49,29 @@ contract Article {
             stakeAmount, 
             address(this)
         ); // Create a new review instance
+        reviews.push(review); // Add the review to the list
+        hasReviewed[msg.sender] = true; // Mark the submitter as having reviewed
+
         emit ReviewSubmitted(id, _ipfsHash, address(review)); // Emit an event for the review submission
+    }
+
+    // Function to get all reviews for the article
+    function getReviews() external view returns (address[] memory) {
+        address[] memory reviewAddresses = new address[](reviews.length); // Create an array to store review addresses
+        for (uint256 i = 0; i < reviews.length; i++) {
+            reviewAddresses[i] = address(reviews[i]); // Store each review's address
+        }
+        return reviewAddresses; // Return the array of review addresses
+    }
+
+    // Function to check if the sender has already reviewed
+    function hasReviewedSender() external view returns (bool) {
+        return hasReviewed[msg.sender]; // Return true if the sender has reviewed
+    }
+
+    // Function to get the article ID
+    function getReviewCount() external view returns (uint256) {
+        return reviews.length; // Return the number of reviews
     }
 
     // Function to get the parent issue

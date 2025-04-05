@@ -77,8 +77,8 @@ export function useJournalContent() {
                 contract: reviewContract,
                 id: reviewData[0],
                 reviewer: reviewData[1],
-                ipfsHash: articleData[2],
-                contentHash: articleData[3],
+                ipfsHash: reviewData[2],
+                contentHash: reviewData[3],
                 isChallenged: reviewData[4],
                 challengeData: isChallenged ? {
                     challenger: challengeData[0],

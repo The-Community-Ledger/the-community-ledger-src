@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useIpfsStore } from "@/hooks/useIpfsStore";
 import { useWallet } from "@/hooks/useWallet";
+import { ethers } from "ethers";
 
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
@@ -9,6 +10,7 @@ import MDEditor from "@uiw/react-md-editor";
 import rehypeSanitize from "rehype-sanitize";
 
 import MarkdownModal from "../markdown-modal";
+import { useJournalContent } from "@/hooks/useJournalContent";
 
 
 const sampleArticle = {
@@ -32,19 +34,31 @@ Understanding photosynthesis helps us address challenges like food security and 
 *“Photosynthesis is not just a process; it is the foundation of life.”*`
 };
 
-const buttonStyle = {
+const activeButtonStyle = {
     padding: '8px 16px',
     borderRadius: '6px',
     fontWeight: '500',
     border: 'none',
     cursor: 'pointer',
-    backgroundColor: 'green',
     color: '#fff',
+    backgroundColor: 'green',
 };
+
+const inactiveButtonStyle = {
+    padding: '8px 16px',
+    borderRadius: '6px',
+    fontWeight: '500',
+    border: 'none',
+    cursor: 'not-allowed',
+    color: '#fff',
+    backgroundColor: '#ccc',
+};
+
 
 // Resolves an article from its CID, check the content, display
 function ArticleCard({ article }) {
-    const { fetchIpfsData } = useIpfsStore();
+    const { fetchIpfsData, storeIpfsData } = useIpfsStore();
+    const { fetchReviewsForArticle } = useJournalContent();
     const [ content, setContent ] = useState("");
     const [ error, setError ] = useState(null);
     const { walletConnectionStatus } = useWallet();
@@ -52,6 +66,31 @@ function ArticleCard({ article }) {
     const [ submitError, setSubmitError ] = useState('');
     const [ isLoading, setIsLoading ] = useState(false);
     const [ isSubmitted, setIsSubmitted ] = useState(false);
+    const [ reviewCount, setReviewCount ] = useState(0);
+    const [ hasReviewed, setHasReviewed ] = useState(false);
+    const [ isFetching, setIsFetching ] = useState(false);
+    const [ isStoring, setIsStoring ] = useState(false);
+    const [ reviews, setReviews ] = useState([]);
+
+
+    // Update states from contract
+    useEffect(() => {
+        const fetchReviewStatus = async () => {
+            setIsFetching(true);
+            const count = await article.contract.getReviewCount();
+            const hasReviewed = await article.contract.hasReviewedSender();
+            console.log("Fetched review status:", { hasReviewed, count });
+            const reviews = await fetchReviewsForArticle(article);
+            console.log("Fetched reviews:", reviews);
+            setReviews(reviews);
+            setHasReviewed(hasReviewed);
+            setReviewCount(count);
+            setIsFetching(false);
+        }
+        if (walletConnectionStatus === "connected" && article) {
+            fetchReviewStatus();
+        }
+    }, [walletConnectionStatus]);
 
     useEffect(() => {
         const _fetchIpfsData = async () => {
@@ -65,6 +104,7 @@ function ArticleCard({ article }) {
                     data = await fetchIpfsData(article.ipfsHash);
                 }
                 if (!data) throw new Error("Error fetching data");
+
                 setContent(data.content);
                 return data;
             } catch (error) {
@@ -150,7 +190,10 @@ function ArticleCard({ article }) {
                     { isLoading && <p>Loading...</p> }
                     { error && <p>Error: {error.message}</p> }
                 </div>
-                <button style={buttonStyle} disabled={isLoading} onClick={() => setModalOpen(true)}>Review</button>
+                {(isLoading || isFetching || hasReviewed) && <button style={inactiveButtonStyle} disabled={true}>Reviewed</button>}
+                {!(isLoading || isFetching || hasReviewed) && 
+                    <button style={activeButtonStyle} onClick={() => setModalOpen(true)}>Review</button>
+                }
             </div>
         </>
      );
