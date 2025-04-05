@@ -47,4 +47,24 @@ contract JournalIssue {
     function isOpen() external view returns (bool) {
         return block.timestamp < issueCloseTime;
     }
+
+    function submitArticle(string calldata _ipfsHash, bytes32 _contentHash) external {
+        require(block.timestamp < issueCloseTime, "Issue is closed");
+        require(jcrToken.balanceOf(msg.sender) >= articleStakeRequired, "Insufficient JCR balance");
+        require(jcrToken.allowance(msg.sender, address(this)) >= articleStakeRequired, "JCR allowance not set");
+
+        jcrToken.transferFrom(msg.sender, address(this), articleStakeRequired);
+
+        articles.push(Article({
+            id: nextArticleId,
+            submitter: msg.sender,
+            ipfsHash: _ipfsHash,
+            contentHash: _contentHash,
+            stakeAmount: articleStakeRequired
+        }));
+
+        nextArticleId++;
+        emit ArticleSubmitted(nextArticleId, _ipfsHash, msg.sender);
+        
+    }
 }
