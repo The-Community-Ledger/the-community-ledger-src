@@ -3,7 +3,7 @@ import { CID } from 'multiformats/cid';
 import { useHelia } from '@/components/providers/helia';
 
 // Custom hook for interacting with IPFS storage
-export function useIpfsStorage() {
+export function useIpfsStore() {
     const { dagService } = useHelia(); // Access the DAG service from the Helia provider
     const [isFetching, setIsFetching] = useState(true); // State to track if data is being fetched
     const [isStoring, setIsStoring] = useState(false); // State to track if data is being stored
@@ -22,7 +22,6 @@ export function useIpfsStorage() {
         }
 
         try {
-
             const cidObj = CID.parse(cid); // Parse the CID string into a CID object
             const data = await dagService.get(cidObj); // Fetch data from IPFS
             return data; // Return the fetched data
