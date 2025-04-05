@@ -2,8 +2,11 @@
 pragma solidity ^0.8.21;
 
 // Importing the IERC20 interface from OpenZeppelin for ERC20 token interactions
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { Article } from "./Article.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IArticleFactory } from "./ArticleFactory.sol";
+
+interface IArticle {}
+
 
 // Contract for managing a journal issue
 contract JournalIssue {
@@ -18,11 +21,12 @@ contract JournalIssue {
     string public issueName; // Name of the journal issue
     string public descriptionIpfsHash; // IPFS hash of the issue description
     bytes32 public descriptionContentHash; // Hash of the issue description content
+    IArticleFactory public articleFactory; // Address of the article factory
 
-    Article[] public articles; // Array to store submitted articles
+    IArticle[] public articles; // Array to store submitted articles
 
     // Event emitted when an article is submitted
-    event ArticleSubmitted(uint256 indexed articleId, string ipfsHash, address articleAdress);
+    event ArticleSubmitted(address articleAdress);
 
     // Constructor to initialize the journal issue
     constructor(
@@ -32,7 +36,8 @@ contract JournalIssue {
         bytes32 _descriptionContentHash, 
         address _jcrToken,
         uint256 _durationDays,
-        uint256 _articleStakeRequired
+        uint256 _articleStakeRequired, 
+        address _articleFactory
     ) {
         jcrToken = IERC20(_jcrToken); // Set the ERC20 token
         issueId = _issueId; // Set the issue ID
@@ -43,6 +48,7 @@ contract JournalIssue {
         issueName = _issueName; // Set the issue name
         descriptionIpfsHash = _descriptionIpfsHash; // Set the description IPFS hash
         descriptionContentHash = _descriptionContentHash; // Set the description content hash
+        articleFactory = IArticleFactory(_articleFactory); // Set the article factory address
     }
 
     // Function to submit an article to the journal
@@ -56,7 +62,7 @@ contract JournalIssue {
         nextArticleId++; // Increment the article ID counter
 
         // Add the article to the list
-        Article article = new Article(
+        address articleAddress = articleFactory.createArticle(
             nextArticleId,
             msg.sender,
             _ipfsHash,
@@ -64,9 +70,9 @@ contract JournalIssue {
             articleStakeRequired,
             address(this) // Pass the address of the parent issue
         );
-        articles.push(article); // Store the article in the array
+        articles.push(IArticle(articleAddress)); // Store the article in the array
 
-        emit ArticleSubmitted(nextArticleId, _ipfsHash, address(article)); // Emit the submission event
+        emit ArticleSubmitted(articleAddress); // Emit the submission event
     }
 
     // Function to check if the issue is still open

@@ -5,9 +5,11 @@ import { JournalIssue } from "./JournalIssue.sol";
 
 contract JournalIssueFactory {
     address public jcrToken;
+    address public articleFactory;
 
-    constructor(address _jcrToken) {
+    constructor(address _jcrToken, address _articleFactory) {
         jcrToken = _jcrToken;
+        articleFactory = _articleFactory;
     }
 
     function createIssue(
@@ -16,7 +18,8 @@ contract JournalIssueFactory {
             string calldata descriptionIpfsHash, 
             bytes32 descriptionContentHash, 
             uint256 durationDays,
-            uint256 articleStakeRequired
+            uint256 articleStakeRequired,
+            address articleFactory
         ) external returns (address) {
         JournalIssue issue = new JournalIssue(
             issueId,
@@ -25,7 +28,8 @@ contract JournalIssueFactory {
             descriptionContentHash,
             jcrToken,
             durationDays,
-            articleStakeRequired
+            articleStakeRequired,
+            articleFactory
         );
         return address(issue);
     }

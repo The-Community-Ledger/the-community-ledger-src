@@ -2,6 +2,7 @@
 pragma solidity 0.8.21;
 
 import { Review, IIssue } from './Review.sol';
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Article {
     uint256 public id; // Unique ID of the article
@@ -10,6 +11,8 @@ contract Article {
     bytes32 public contentHash; // Hash of the article content for verification
     uint256 public stakeAmount; // Amount of JCR tokens staked for the article
     IIssue public parentIssue; // Address of the parent issue
+    IERC20 public jcrToken; // Address of the JCR token contract
+
     
     // Event emitted when a review is submitted
     event ReviewSubmitted(uint256 indexed articleId, string ipfsHash, address reviewAddress);
@@ -20,6 +23,7 @@ contract Article {
         address _submitter,
         string memory _ipfsHash,
         bytes32 _contentHash,
+        address _jcrToken,
         uint256 _stakeAmount, 
         address _parentIssue
     ) {
@@ -27,6 +31,7 @@ contract Article {
         submitter = _submitter; // Set the submitter's address
         ipfsHash = _ipfsHash; // Set the IPFS hash
         contentHash = _contentHash; // Set the content hash
+        jcrToken = IERC20(_jcrToken); // Set the JCR token address
         stakeAmount = _stakeAmount; // Set the stake amount
         parentIssue = IIssue(_parentIssue); // Set the parent issue address
     }

@@ -16,11 +16,20 @@ async function main() {
   console.log("JournalCredit deployed to:", journalCredit.target); // Log the deployed address of JournalCredit
 
   /** 
+   * Deploy the ArticleFactory contract
+   * @dev This contract is used to create new articles.
+   */
+  const ArticleFactory = await ethers.getContractFactory("ArticleFactory"); // Get the contract factory for ArticleFactory
+  const articleFactory = await ArticleFactory.deploy(journalCredit.target); // Deploy the ArticleFactory contract with the journal credit address
+  await articleFactory.waitForDeployment(); // Wait for the deployment to complete
+  console.log("ArticleFactory deployed to:", articleFactory.target); // Log the deployed address of ArticleFactory
+
+  /** 
    * Deploy the JournalIssueFactory contract
    * @dev This contract is used to create new journal issues.
    */
   const JournalIssueFactory = await ethers.getContractFactory("JournalIssueFactory"); // Get the contract factory for JournalIssueFactory
-  const journalIssueFactory = await JournalIssueFactory.deploy(journalCredit.target); // Deploy the JournalIssueFactory contract with the journal credit address
+  const journalIssueFactory = await JournalIssueFactory.deploy(journalCredit.target, articleFactory.target); // Deploy the JournalIssueFactory contract with the journal credit address
   await journalIssueFactory.waitForDeployment(); // Wait for the deployment to complete
   console.log("JournalIssueFactory deployed to:", journalIssueFactory.target); // Log the deployed address of JournalIssueFactory
 
@@ -53,7 +62,8 @@ async function main() {
     descriptionContentHash,
     journalCredit.target,
     durationDays,
-    articleStakeRequired
+    articleStakeRequired, 
+    articleFactory.target,
   );
   await journalIssue.waitForDeployment(); // Wait for the deployment to complete
   console.log("JournalIssue deployed to:", journalIssue.target); // Log the deployed address of JournalIssue
