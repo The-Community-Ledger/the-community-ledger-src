@@ -18,6 +18,9 @@ contract Review {
     Challenge public challenge; // Challenge struct to store challenge details
     bool public isChallenged; // Flag to indicate if the review is challenged
 
+    // Event emitted when a challenge is submitted
+    event ChallengeSubmitted(uint256 indexed reviewId, address indexed challenger, string ipfsHash, address reviewAddress);
+
     // Constructor to initialize the review
     constructor(
         uint256 _id,
@@ -44,8 +47,12 @@ contract Review {
         bytes32 _contentHash,
         uint256 _stakeAmount
     ) external {
+        require(!isChallenged, "Review is already challenged"); // Ensure the review is not already challenged
+        require(parentArticle.parentIssue.isOpen(), "Issue is closed"); // Ensure the parent issue is open
+
         challenge = Challenge(_challenger, _ipfsHash, _contentHash, _stakeAmount); // Set the challenge details
         isChallenged = true; // Set the challenge flag to true
+        emit ChallengeSubmitted(id, _challenger, _ipfsHash, address(this)); // Emit an event for the challenge submission
     }
 
     // Function to get the challenge details

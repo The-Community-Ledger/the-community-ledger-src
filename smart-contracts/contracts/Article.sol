@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.21;
 
+import './Review.sol';
+
 contract Article {
     uint256 public id; // Unique ID of the article
     address public submitter; // Address of the author
@@ -28,7 +30,16 @@ contract Article {
 
     // Function to submit a review for the article
     function submitReview(string calldata _ipfsHash, bytes32 _contentHash) external {
-
+        require(parentIssue.isOpen(), "Issue is closed"); // Ensure the parent issue is open
+        Review review = new Review(
+            id,
+            msg.sender,
+            _ipfsHash,
+            _contentHash,
+            stakeAmount, 
+            address(this)
+        ); // Create a new review instance
+        emit ReviewSubmitted(id, _ipfsHash, address(review)); // Emit an event for the review submission
     }
 
     // Function to get the article details
