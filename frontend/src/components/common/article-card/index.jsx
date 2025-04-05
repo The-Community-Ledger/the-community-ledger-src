@@ -8,6 +8,8 @@ import "@uiw/react-markdown-preview/markdown.css";
 import MDEditor from "@uiw/react-md-editor";
 import rehypeSanitize from "rehype-sanitize";
 
+import MarkdownModal from "../markdown-modal";
+
 
 const sampleArticle = {
     content: `# The Wonders of Photosynthesis
@@ -30,14 +32,26 @@ Understanding photosynthesis helps us address challenges like food security and 
 *“Photosynthesis is not just a process; it is the foundation of life.”*`
 };
 
+const buttonStyle = {
+    padding: '8px 16px',
+    borderRadius: '6px',
+    fontWeight: '500',
+    border: 'none',
+    cursor: 'pointer',
+    backgroundColor: 'green',
+    color: '#fff',
+};
 
 // Resolves an article from its CID, check the content, display
 function ArticleCard({ article }) {
     const { fetchIpfsData } = useIpfsStore();
     const [ content, setContent ] = useState("");
-    const [ isLoading, setIsLoading ] = useState(true);
     const [ error, setError ] = useState(null);
     const { walletConnectionStatus } = useWallet();
+    const [ modalOpen, setModalOpen ] = useState(false);    
+    const [ submitError, setSubmitError ] = useState('');
+    const [ isLoading, setIsLoading ] = useState(false);
+    const [ isSubmitted, setIsSubmitted ] = useState(false);
 
     useEffect(() => {
         const _fetchIpfsData = async () => {
@@ -65,12 +79,83 @@ function ArticleCard({ article }) {
     }
     , [article, walletConnectionStatus]);
 
+    // Handle markdown submit
+    const handleSubmit = async (md) => {
+        if (!md) {
+            setSubmitError("Empty content.");
+            return;
+        }
+        console.log("Submitting markdown:", md);
+        setIsLoading(true);
+        setSubmitError("");
+        let cid; 
+        try {
+            cid = await storeIpfsData({ content: md });
+            if (!cid) {
+                setSubmitError("Error storing IPFS data.");
+                return;
+            }
+            const data = await fetchIpfsData(cid);
+            if (!data) {
+                setSubmitError("Error fetching IPFS data.");
+                return;
+            }
+            console.log("Stored IPFS data with CID:", cid);
+            } catch (error) {
+            console.error("Error storing IPFS data:", error);
+            setSubmitError("Error storing IPFS data.");
+            setIsLoading(false);
+            return;
+        }
+        try {// Store data on chain
+
+            // Step 1: Convert JSON to string
+            const jsonString = JSON.stringify(md);
+            
+            // Step 2: Hash it with keccak256 to get bytes32
+            const contentHash = ethers.keccak256(ethers.toUtf8Bytes(jsonString));
+            
+            // Step 3: Call the submitArticle function
+            console.log("Submitting article to contract:", article.contract);
+            const submitTx = await article.contract.submitReview(cid, contentHash);
+            console.log("Transaction submitted:", submitTx);
+            setIsSubmitted(true);
+        } catch (error) {
+            console.error("Error submitting article:", error);
+            setSubmitError("Error submitting article.");
+        }   
+        setIsLoading(false);
+    }
+
+
+
     return ( 
-        <div style={{ padding: "2rem", paddingTop: '1rem', minWidth: "400px", height: "550px", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)", fontSize: '60%', overflow: 'scroll'}}>
-            { content && <MDEditor.Markdown source={ content } previewOptions={{rehypePlugins: [[rehypeSanitize]],}}/> }
-            { isLoading && <p>Loading...</p> }
-            { error && <p>Error: {error.message}</p> }
-        </div>
+        <>
+            <MarkdownModal
+                isOpen={modalOpen}
+                isSubmitted={isSubmitted}
+                isLoading={isLoading}
+                error={submitError}
+                onClose={() => setModalOpen(false)}
+                onSubmit={handleSubmit}
+                title={"Submit an review"}
+                initialValue=""
+            >
+                { content && <MDEditor.Markdown source={ content } previewOptions={{rehypePlugins: [[rehypeSanitize]],}}/> }
+            </MarkdownModal>
+
+
+            <div style={{ padding: "2rem", paddingTop: '1rem', minWidth: "400px", height: "550px", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)", fontSize: '60%', overflow: 'scroll', 
+                display: 'flex', flexDirection: 'column', gap: "2rem"
+            }}>
+                <div style={{ borderBottom: "1px solid #eee", paddingBottom: "1rem" }}>
+                    { content && <MDEditor.Markdown source={ content } previewOptions={{rehypePlugins: [[rehypeSanitize]],}}/> }
+                    { isLoading && <p>Loading...</p> }
+                    { error && <p>Error: {error.message}</p> }
+                </div>
+                <button style={buttonStyle} disabled={isLoading} onClick={() => setModalOpen(true)}>Review</button>
+            </div>
+        </>
      );
 }
 

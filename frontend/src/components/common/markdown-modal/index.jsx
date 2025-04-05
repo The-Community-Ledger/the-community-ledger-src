@@ -23,7 +23,6 @@ const modalContentStyle = {
   borderRadius: '12px',
   boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
   width: '100%',
-  maxWidth: '800px',
   padding: '24px',
 };
 
@@ -93,27 +92,37 @@ const MarkdownModal = ({
 
   return (
     <div style={modalBackdropStyle}>
-      <div style={modalContentStyle}>
+      <div style={{
+            ...modalContentStyle,
+            ...(children ? {} : { maxWidth: '800px' }),
+        }}>
         <h2 style={titleStyle}>{title}</h2>
 
-        {children && <div style={{ marginBottom: '16px' }}>{children}</div>}
-
-        <MDEditor value={markdown} onChange={setMarkdown} height={'600px'} previewOptions={{rehypePlugins: [[rehypeSanitize]],}} />
-
-        <div style={buttonRowStyle}>
-          <button style={closeButtonStyle} onClick={onClose} disabled={isLoading}>
-            Close
-          </button>
-          {!isSubmitted &&
-            <button style={submitButtonStyle} onClick={() => onSubmit(markdown)} disabled={isLoading || isSubmitted}>
-                Submit
-            </button>}
-            {isSubmitted &&
-            <button style={submittedButtonStyle} disabled>
-                Submitted
-            </button>}
-          {error && <p style={{ color: 'red', marginTop: '8px' }}>{error}</p>}
-        </div>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'stretch',
+            // padding: '0 20px',
+        }}> 
+            {children && <div style={{ marginBottom: '16px', maxWidth: '50vw'}}>{children}</div>}
+            <div>
+                <MDEditor value={markdown} onChange={setMarkdown} height={'600px'} previewOptions={{rehypePlugins: [[rehypeSanitize]],}} />
+                <div style={buttonRowStyle}>
+                <button style={closeButtonStyle} onClick={onClose} disabled={isLoading}>
+                    Close
+                </button>
+                {!isSubmitted &&
+                    <button style={submitButtonStyle} onClick={() => onSubmit(markdown)} disabled={isLoading || isSubmitted}>
+                        Submit
+                    </button>}
+                    {isSubmitted &&
+                    <button style={submittedButtonStyle} disabled>
+                        Submitted
+                    </button>}
+                {error && <p style={{ color: 'red', marginTop: '8px' }}>{error}</p>}
+                </div>
+            </div>
+      </div>
       </div>
     </div>
   );
