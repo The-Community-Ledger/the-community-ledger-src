@@ -79,4 +79,9 @@ contract JournalIssue {
     function isOpen() external view returns (bool) {
         return block.timestamp < issueCloseTime;
     }
+
+    // Function to get the details of the issue
+    function getIssueDetails() external view returns (uint256, address, string memory, string memory, uint256) {
+        return (issueId, issueOwner, issueName, descriptionIpfsHash, articleStakeRequired);
+    }
 }

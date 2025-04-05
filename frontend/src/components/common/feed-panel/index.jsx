@@ -1,13 +1,13 @@
 import { useJournalFeed } from "@/components/providers/journal-feed";
+import IssuePanel from "@/components/common/issue-panel";
 
 
 function FeedPanel() {
     const { issues } = useJournalFeed()
-    console.log('here', issues, issues.length)
     return ( 
         <div>
             {issues.length == 0 && <p>No issues to display.</p>}
-            {issues.map((issue) => <IssuePannel issue={issue} />)}
+            {issues.map((issue, i) => <IssuePanel key={i} issue={issue} />)}
         </div>
     );
 }

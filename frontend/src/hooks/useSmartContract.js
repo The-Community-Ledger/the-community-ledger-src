@@ -62,14 +62,23 @@ export const useSmartContract = () => {
         return smartContract;
     }
 
+    const getAbi = (name) => {
+        const smartContractData = contractsData[name];
+        if (!smartContractData) return null;
+
+        return smartContractData.abi;
+    }
+
     return {
         // Data
         deployedNetworkData,
+        contractsData,
 
         // Methods
         getSmartContract,
         getAllSmartContractNames,
-        getSmartContractFromAddress
+        getSmartContractFromAddress, 
+        getAbi
     }
 }
 

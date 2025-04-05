@@ -27,7 +27,7 @@ contract JournalCore {
         issueFactory = IJournalIssueFactory(_issueFactory);
     }
 
-    function openIssue(    
+    function createIssue(    
         string calldata issueName,
         string calldata descriptionIpfsHash, 
         bytes32 descriptionContentHash, 
@@ -56,4 +56,18 @@ contract JournalCore {
     function getIssueStakeRequired() external view returns (uint256) {
         return issueStakeRequired;
     }
+
+    function getIssues() external view returns (address[] memory) {
+        address[] memory issueAddresses = new address[](issues.length);
+        for (uint256 i = 0; i < issues.length; i++) {
+            issueAddresses[i] = address(issues[i]);
+        }
+        return issueAddresses;
+    }
+
+    function getIssue(uint256 issueId) external view returns (address) {
+        require(issueId < issues.length, "Invalid issue ID");
+        return address(issues[issueId]);
+    }
+
 }

@@ -45,15 +45,19 @@ async function main() {
 
   // Deploy an example of the JournalIssue/Article/Review contracts
 
-  // /**
-  //  * Deploy the JournalIssue contract
-  //  * @dev This contract is used to manage individual journal issues.
-  //  */
-  // const issueName = "Advances"; // Name of the journal issue
-  // const descriptionIpfsHash = "QmSampleHash"; // IPFS hash for the issue description
-  // const descriptionContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Content')); // Hash of the issue content
-  // const durationDays = 10000000; // Duration of the journal issue in days
-  // const articleStakeRequired = ethers.parseEther("10"); // Stake required for submitting an article
+  /**
+   * Deploy the JournalIssue contract
+   * @dev This contract is used to manage individual journal issues.
+   */
+  const issueName = "Advances"; // Name of the journal issue
+  const descriptionIpfsHash = "QmSampleHash"; // IPFS hash for the issue description
+  const descriptionContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Content')); // Hash of the issue content
+  const durationDays = 10000000; // Duration of the journal issue in days
+  const articleStakeRequired = ethers.parseEther("10"); // Stake required for submitting an article
+
+  journalCredit.approve(journalCore.target, ethers.parseEther("10000")); // Approve the JournalCore contract to spend the journal credit
+  await journalCore.createIssue(issueName, descriptionIpfsHash, descriptionContentHash, durationDays, articleStakeRequired); // Create a new journal issue
+  console.log("JournalIssue created with name:", issueName); // Log the name of the created journal issue
 
   // // Deploy the JournalIssue contract with the specified parameters
   // const JournalIssue = await ethers.getContractFactory("JournalIssue"); // Get the contract factory for JournalIssue
