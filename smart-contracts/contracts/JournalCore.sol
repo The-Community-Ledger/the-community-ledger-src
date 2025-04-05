@@ -2,22 +2,29 @@
 pragma solidity ^0.8.21;
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { JournalIssue } from "./JournalIssue.sol";
+import { IJournalIssueFactory } from "./JournalIssueFactory.sol";
 
+interface IJournalIssue {
+    function submitArticle(string calldata _ipfsHash, bytes32 _contentHash) external;
+    function getIssueDetails() external view returns (uint256, address, string memory, bytes32, uint256);
+    function getIssueId() external view returns (uint256);
+}
 
 contract JournalCore {
     address public owner;
     IERC20 public jcrToken;
     uint256 public issueStakeRequired;
+    IJournalIssueFactory public issueFactory;
 
-    JournalIssue[] public issues;
+    IJournalIssue[] public issues;
 
     event IssueOpened(uint256 indexed issueId, address issueAddress);
 
-    constructor(address _jcrToken, uint256 _issueStakeRequired) {
+    constructor(address _jcrToken, uint256 _issueStakeRequired, address _issueFactory) {
         owner = msg.sender;
         jcrToken = IERC20(_jcrToken);
         issueStakeRequired = _issueStakeRequired;
+        issueFactory = IJournalIssueFactory(_issueFactory);
     }
 
     function openIssue(    
@@ -33,18 +40,17 @@ contract JournalCore {
         jcrToken.transferFrom(msg.sender, address(this), issueStakeRequired); // Transfer tokens for staking
 
         // Deploy new Issue contract
-        JournalIssue issue = new JournalIssue(
+        address issueAddress = issueFactory.createIssue(
             issues.length,
             issueName,
             descriptionIpfsHash,
             descriptionContentHash,
-            address(jcrToken),
             durationDays,
             articleStakeRequired
         );
 
-        issues.push(issue);
-        emit IssueOpened(issues.length - 1, address(issue));
+        issues.push(IJournalIssue(issueAddress));
+        emit IssueOpened(issues.length - 1,issueAddress);
     }
 
     function getIssueCount() external view returns (uint256) {
@@ -56,7 +62,7 @@ contract JournalCore {
         return address(issues[index]);
     }
 
-    function getIssues() external view returns (JournalIssue[] memory) {
+    function getIssues() external view returns (IJournalIssue[] memory) {
         return issues;
     }
 

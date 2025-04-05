@@ -15,13 +15,22 @@ async function main() {
   await journalCredit.waitForDeployment(); // Wait for the deployment to complete
   console.log("JournalCredit deployed to:", journalCredit.target); // Log the deployed address of JournalCredit
 
+  /** 
+   * Deploy the JournalIssueFactory contract
+   * @dev This contract is used to create new journal issues.
+   */
+  const JournalIssueFactory = await ethers.getContractFactory("JournalIssueFactory"); // Get the contract factory for JournalIssueFactory
+  const journalIssueFactory = await JournalIssueFactory.deploy(journalCredit.target); // Deploy the JournalIssueFactory contract with the journal credit address
+  await journalIssueFactory.waitForDeployment(); // Wait for the deployment to complete
+  console.log("JournalIssueFactory deployed to:", journalIssueFactory.target); // Log the deployed address of JournalIssueFactory
+
   /**
    * Deploy the JournalCore contract
    * @dev This contract is used to manage the core functionalities of the journal.
    */
   const issueStakeRequired = ethers.parseEther("1000"); // Set the issue stake required to 10 tokens
   const JournalCore = await ethers.getContractFactory("JournalCore"); // Get the contract factory for JournalCore
-  const journalCore = await JournalCore.deploy(journalCredit.target, issueStakeRequired); // Deploy the JournalCore contract with the wall contract address
+  const journalCore = await JournalCore.deploy(journalCredit.target, issueStakeRequired, journalIssueFactory.target); // Deploy the JournalCore contract with the wall contract address
   await journalCore.waitForDeployment(); // Wait for the deployment to complete
   console.log("JournalCore deployed to:", journalCore.target); // Log the deployed address of JournalCore
 
@@ -47,7 +56,7 @@ async function main() {
     articleStakeRequired
   );
   await journalIssue.waitForDeployment(); // Wait for the deployment to complete
-  console.log("JournalIssue deployed to:", sampleIssue); // Log the deployed address of JournalIssue
+  console.log("JournalIssue deployed to:", journalIssue.target); // Log the deployed address of JournalIssue
 }
 
 // We recommend this pattern to be able to use async/await everywhere
