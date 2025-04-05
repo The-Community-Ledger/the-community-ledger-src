@@ -1,4 +1,5 @@
 import ConnectButton from "../connect-btn";
+import Link from "next/link";
 
 
 function Header() {
@@ -27,8 +28,47 @@ function Header() {
                     <ConnectButton />
                 </div>
             </div>
+
+            {/* Nav bar below title */}
+            <nav
+                style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '2rem',
+                padding: '0.75rem 0 1rem',
+                borderTop: '1px solid #eee',
+                fontSize: '1rem',
+                height: '2rem',
+                }}
+            >
+                <NavItem label="Issues" href="/issues" />
+                <NavItem label="Explore" href="/explore" />
+                <NavItem label="Submit" href="/submit" />
+                <NavItem label="About" href="/about" />
+            </nav>
         </header>
      );
 }
+
+
+function NavItem({ label, href }) {
+    return (
+      <Link href={href} passHref legacyBehavior>
+          <a
+          style={{
+              textDecoration: 'none',
+              color: '#333',
+              fontWeight: '500',
+              paddingBottom: '0.25rem',
+              height: '1rem',
+          }}
+          onMouseEnter={e => (e.target.style.borderBottom = '2px solid #333')}
+          onMouseLeave={e => (e.target.style.borderBottom = 'none')}
+          >
+          {label}
+          </a>
+      </Link>
+    )
+  }
 
 export default Header;
