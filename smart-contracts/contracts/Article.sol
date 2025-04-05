@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.21;
 
-import './Review.sol';
+import { Review, IIssue } from './Review.sol';
 
 contract Article {
     uint256 public id; // Unique ID of the article

@@ -2,9 +2,9 @@
 pragma solidity ^0.8.21;
 
 // Importing the IERC20 interface from OpenZeppelin for ERC20 token interactions
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "./Article.sol";
+import { Article } from "./Article.sol";
 
 // Contract for managing a journal issue
 contract JournalIssue {
