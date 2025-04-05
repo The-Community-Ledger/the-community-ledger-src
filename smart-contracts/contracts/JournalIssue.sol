@@ -1,31 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.21;
 
+// Importing the IERC20 interface from OpenZeppelin for ERC20 token interactions
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+// Contract for managing a journal issue
 contract JournalIssue {
+    // Struct to represent an article submitted to the journal
     struct Article {
-        uint256 id;
+        uint256 id; // Unique ID of the article
         address submitter; // Address of the author
         string ipfsHash; // IPFS hash of the article
-        bytes32 contentHash; // Hash of the article content (in case of unpin on IPFS)
-        uint256 stakeAmount; // Amount of JCR staked 
+        bytes32 contentHash; // Hash of the article content for verification
+        uint256 stakeAmount; // Amount of JCR tokens staked for the article
     }
 
-    IERC20 public jcrToken;
-    address public issueOwner;
-    uint256 public issueOpenTime;
-    uint256 public issueCloseTime;
-    uint256 public articleStakeRequired;
-    uint256 public nextArticleId;
-    string public issueName;
-    string public descriptionIpfsHash;
-    bytes32 public descriptionContentHash;
+    // State variables
+    IERC20 public jcrToken; // ERC20 token used for staking
+    address public issueOwner; // Owner of the journal issue
+    uint256 public issueOpenTime; // Timestamp when the issue was opened
+    uint256 public issueCloseTime; // Timestamp when the issue will close
+    uint256 public articleStakeRequired; // Minimum stake required to submit an article
+    uint256 public nextArticleId; // Counter for the next article ID
+    string public issueName; // Name of the journal issue
+    string public descriptionIpfsHash; // IPFS hash of the issue description
+    bytes32 public descriptionContentHash; // Hash of the issue description content
 
-    Article[] public articles;
+    Article[] public articles; // Array to store submitted articles
 
+    // Event emitted when an article is submitted
     event ArticleSubmitted(uint256 indexed articleId, string ipfsHash, address submitter);
 
+    // Constructor to initialize the journal issue
     constructor(
         string memory _issueName,
         string memory _descriptionIpfsHash, 
@@ -34,25 +40,27 @@ contract JournalIssue {
         uint256 _durationDays,
         uint256 _articleStakeRequired
     ) {
-        jcrToken = IERC20(_jcrToken);
-        issueOwner = msg.sender;
-        issueOpenTime = block.timestamp;
-        issueCloseTime = block.timestamp + (_durationDays * 1 days);
-        articleStakeRequired = _articleStakeRequired;
-        issueName = _issueName;
-        descriptionIpfsHash = _descriptionIpfsHash;
-        descriptionContentHash = _descriptionContentHash;
+        jcrToken = IERC20(_jcrToken); // Set the ERC20 token
+        issueOwner = msg.sender; // Set the owner of the issue
+        issueOpenTime = block.timestamp; // Set the opening time
+        issueCloseTime = block.timestamp + (_durationDays * 1 days); // Set the closing time
+        articleStakeRequired = _articleStakeRequired; // Set the required stake
+        issueName = _issueName; // Set the issue name
+        descriptionIpfsHash = _descriptionIpfsHash; // Set the description IPFS hash
+        descriptionContentHash = _descriptionContentHash; // Set the description content hash
     }
 
+    // Function to submit an article to the journal
     function submitArticle(string calldata _ipfsHash, bytes32 _contentHash) external {
-        require(block.timestamp < issueCloseTime, "Issue is closed");
-        require(jcrToken.balanceOf(msg.sender) >= articleStakeRequired, "Insufficient JCR balance");
-        require(jcrToken.allowance(msg.sender, address(this)) >= articleStakeRequired, "JCR allowance not set");
+        require(block.timestamp < issueCloseTime, "Issue is closed"); // Ensure the issue is open
+        require(jcrToken.balanceOf(msg.sender) >= articleStakeRequired, "Insufficient JCR balance"); // Check token balance
+        require(jcrToken.allowance(msg.sender, address(this)) >= articleStakeRequired, "JCR allowance not set"); // Check token allowance
 
-        jcrToken.transferFrom(msg.sender, address(this), articleStakeRequired);
+        jcrToken.transferFrom(msg.sender, address(this), articleStakeRequired); // Transfer tokens for staking
 
-        nextArticleId++;
+        nextArticleId++; // Increment the article ID counter
 
+        // Add the article to the list
         articles.push(Article({
             id: nextArticleId,
             submitter: msg.sender,
@@ -61,22 +69,26 @@ contract JournalIssue {
             stakeAmount: articleStakeRequired
         }));
 
-        emit ArticleSubmitted(nextArticleId, _ipfsHash, msg.sender);
+        emit ArticleSubmitted(nextArticleId, _ipfsHash, msg.sender); // Emit the submission event
     }
 
+    // Function to check if the issue is still open
     function isOpen() external view returns (bool) {
         return block.timestamp < issueCloseTime;
     }
 
+    // Function to get all submitted articles
     function getArticles() external view returns (Article[] memory) {
         return articles;
     }
 
+    // Function to get details of a specific article by ID
     function getArticle(uint256 _articleId) external view returns (Article memory) {
-        require(_articleId < nextArticleId, "Invalid article ID");
+        require(_articleId < nextArticleId, "Invalid article ID"); // Ensure the article ID is valid
         return articles[_articleId];
     }
 
+    // Function to get details of the journal issue
     function getIssueDetails() external view returns (
         string memory,
         string memory,

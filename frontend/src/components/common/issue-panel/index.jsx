@@ -1,7 +1,6 @@
 
-// Display issues 
-function IssuePanel() {
-    
+// Checks issue, display its content as articles
+function IssuePanel({ issue }) {
 
     return ( <></> );
 }
