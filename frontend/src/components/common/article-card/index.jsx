@@ -140,10 +140,7 @@ function ArticleCard({ article }) {
                 onSubmit={handleSubmit}
                 title={"Submit an review"}
                 initialValue=""
-            >
-                { content && <MDEditor.Markdown source={ content } previewOptions={{rehypePlugins: [[rehypeSanitize]],}}/> }
-            </MarkdownModal>
-
+            />
 
             <div style={{ padding: "2rem", paddingTop: '1rem', minWidth: "400px", height: "550px", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)", fontSize: '60%', overflow: 'scroll', 
                 display: 'flex', flexDirection: 'column', gap: "2rem"
