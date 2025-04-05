@@ -35,6 +35,9 @@
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Gloock:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=News+Cycle:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bona+Nova:wght@400;700&display=swap');
 
 
 * {
@@ -85,4 +88,54 @@ input {
 button {
   cursor: pointer;
   border: none;
+}
+
+
+/* Markdown Editor Customization using News Cycle font */
+.mde-editor, 
+.wmde-markdown {
+  font-family: 'Nanum Myeongjo', serif;
+  font-size: 0.5rem;
+}
+
+.mde-editor, 
+.wmde-markdown h1, h2, h3, h4, h5, h6 ::after  {
+  font-family: 'Bona Nova', serif;
+  font-size: 0.4rem;
+  margin: 0;
+}
+
+.mde-editor, 
+.wmde-markdown h1 {
+  font-size: 1.4rem !important ;
+  font-weight: 800;
+}
+.mde-editor, 
+.wmde-markdown h2 {
+  font-size: 1.3rem !important ;
+  font-weight: 800;
+}
+.mde-editor, 
+.wmde-markdown h3 {
+  font-size: 1.2rem !important ;
+  font-weight: 800;
+}
+.mde-editor, 
+.wmde-markdown h4 {
+  font-size: 1.1rem !important ;
+  font-weight: 800;
+}
+
+.mde-editor, 
+.wmde-markdown p, li, blockquote {
+  font-family: 'Nanum Myeongjo', serif;
+  margin: 0;
+  font-weight: 300;
+  font-size: .9rem !important;
+}
+
+.mde-editor, 
+.wmde-markdown strong ::after{
+  font-family: 'Nanum Myeongjo', serif;
+  font-weight: 800;
 }
