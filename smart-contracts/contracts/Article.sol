@@ -3,6 +3,7 @@ pragma solidity 0.8.21;
 
 import { Review, IIssue } from './Review.sol';
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IJCRMinter } from './JournalCredit.sol';
 
 contract Article {
     uint256 public id; // Unique ID of the article
@@ -12,6 +13,8 @@ contract Article {
     uint256 public stakeAmount; // Amount of JCR tokens staked for the article
     IIssue public parentIssue; // Address of the parent issue
     IERC20 public jcrToken; // Address of the JCR token contract
+    uint256 public reviewStakeRequired; // Amount of JCR tokens required for review
+    uint256 public reviewStakeAmount; // Amount of JCR tokens staked for the review
 
     Review[] public reviews; // Instance of the Review contract
     mapping(address => bool) public hasReviewed; // Mapping to track if an address has reviewed
@@ -36,11 +39,18 @@ contract Article {
         jcrToken = IERC20(_jcrToken); // Set the JCR token address
         stakeAmount = _stakeAmount; // Set the stake amount
         parentIssue = IIssue(_parentIssue); // Set the parent issue address
+        reviewStakeAmount = 0; // Set the stake amount for the review
     }
 
     // Function to submit a review for the article
     function submitReview(string calldata _ipfsHash, bytes32 _contentHash) external {
         require(parentIssue.isOpen(), "Issue is closed"); // Ensure the parent issue is open
+        require(!hasReviewed[msg.sender], "Already reviewed"); // Ensure the sender has not already reviewed
+        require(jcrToken.balanceOf(msg.sender) >= stakeAmount, "Insufficient JCR balance"); // Check token balance
+        require(jcrToken.allowance(msg.sender, address(this)) >= stakeAmount, "JCR allowance not set"); // Check token allowance
+
+        jcrToken.transferFrom(msg.sender, IJCRMinter(address(jcrToken)).getMinter(), stakeAmount); // Transfer tokens for staking
+
         Review review = new Review(
             id,
             msg.sender,

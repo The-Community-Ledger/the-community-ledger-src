@@ -18,7 +18,8 @@ contract JournalIssueFactory {
             string calldata descriptionIpfsHash, 
             bytes32 descriptionContentHash, 
             uint256 durationDays,
-            uint256 articleStakeRequired
+            uint256 articleStakeRequired,
+            uint256 reviewStakeRequired
         ) external returns (address) {
         JournalIssue issue = new JournalIssue(
             issueId,
@@ -28,6 +29,7 @@ contract JournalIssueFactory {
             jcrToken,
             durationDays,
             articleStakeRequired,
+            reviewStakeRequired,
             articleFactory
         );
         return address(issue);
@@ -41,6 +43,7 @@ interface IJournalIssueFactory {
         string calldata descriptionIpfsHash, 
         bytes32 descriptionContentHash, 
         uint256 durationDays,
-        uint256 articleStakeRequired
+        uint256 articleStakeRequired,
+        uint256 reviewStakeRequired
     ) external returns (address);
 }

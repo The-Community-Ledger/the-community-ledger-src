@@ -3,6 +3,7 @@ pragma solidity ^0.8.21;
 
 // Importing the IERC20 interface from OpenZeppelin for ERC20 token interactions
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IJCRMinter } from "./JournalCredit.sol"; // Importing the Journal Credit Minter interface
 import { IArticleFactory } from "./ArticleFactory.sol";
 import { console } from "hardhat/console.sol";
 
@@ -19,6 +20,7 @@ contract JournalIssue {
     uint256 public issueOpenTime; // Timestamp when the issue was opened
     uint256 public issueCloseTime; // Timestamp when the issue will close
     uint256 public articleStakeRequired; // Minimum stake required to submit an article
+    uint256 public reviewStakeRequired; // Minimum stake required to review an article
     uint256 public nextArticleId; // Counter for the next article ID
     string public issueName; // Name of the journal issue
     string public descriptionIpfsHash; // IPFS hash of the issue description
@@ -39,6 +41,7 @@ contract JournalIssue {
         address _jcrToken,
         uint256 _durationDays,
         uint256 _articleStakeRequired, 
+        uint256 _reviewStakeRequired,
         address _articleFactory
     ) {
         jcrToken = IERC20(_jcrToken); // Set the ERC20 token
@@ -47,6 +50,7 @@ contract JournalIssue {
         issueOpenTime = block.timestamp; // Set the opening time
         issueCloseTime = block.timestamp + (_durationDays * 1 days); // Set the closing time
         articleStakeRequired = _articleStakeRequired; // Set the required stake
+        reviewStakeRequired = _reviewStakeRequired; // Set the required review stake
         issueName = _issueName; // Set the issue name
         descriptionIpfsHash = _descriptionIpfsHash; // Set the description IPFS hash
         descriptionContentHash = _descriptionContentHash; // Set the description content hash
@@ -59,7 +63,7 @@ contract JournalIssue {
         require(jcrToken.balanceOf(msg.sender) >= articleStakeRequired, "Insufficient JCR balance"); // Check token balance
         require(jcrToken.allowance(msg.sender, address(this)) >= articleStakeRequired, "JCR allowance not set"); // Check token allowance
 
-        jcrToken.transferFrom(msg.sender, address(this), articleStakeRequired); // Transfer tokens for staking
+        jcrToken.transferFrom(msg.sender, IJCRMinter(address(jcrToken)).getMinter(), articleStakeRequired); // Transfer tokens for staking
 
         nextArticleId++; // Increment the article ID counter
 
@@ -69,7 +73,7 @@ contract JournalIssue {
             msg.sender,
             _ipfsHash,
             _contentHash,
-            articleStakeRequired,
+            reviewStakeRequired,
             address(this) // Pass the address of the parent issue
         );
         articles.push(IArticle(articleAddress)); // Store the article in the array
@@ -94,5 +98,16 @@ contract JournalIssue {
             articleAddresses[i] = address(articles[i]);
         }
         return articleAddresses;
+    }
+
+    function getArticleStakeRequired() external view returns (uint256) {
+        return articleStakeRequired;
+    }
+    function getReviewerStakeRequired() external view returns (uint256) {
+        return reviewStakeRequired;
+    }
+
+    function getOwner() external view returns (address) {
+        return issueOwner;
     }
 }

@@ -9,7 +9,7 @@ async function main() {
    * Deploy the JournalCredit contract
    * @dev This contract is used to manage the Journal credits.
    */
-  const initialSupply = ethers.parseEther("1000000000"); // Set the initial supply to 1,000,000,000 tokens
+  const initialSupply = ethers.parseEther("10000"); // Set the initial supply to 1,000,000,000 tokens
   const JournalCredit = await ethers.getContractFactory("JournalCredit"); // Get the contract factory for JournalCredit
   const journalCredit = await JournalCredit.deploy(initialSupply); // Deploy the JournalCredit contract with the initial supply
   await journalCredit.waitForDeployment(); // Wait for the deployment to complete
@@ -42,6 +42,8 @@ async function main() {
   const journalCore = await JournalCore.deploy(journalCredit.target, issueStakeRequired, journalIssueFactory.target); // Deploy the JournalCore contract with the wall contract address
   await journalCore.waitForDeployment(); // Wait for the deployment to complete
   console.log("JournalCore deployed to:", journalCore.target); // Log the deployed address of JournalCore
+
+  await journalCredit.setMinter(journalCore.target);
 
   // Deploy an example of the JournalIssue/Article/Review contracts
 
@@ -108,10 +110,11 @@ async function createIssue(issueName, journalCredit, journalCore) {
   const descriptionIpfsHash = "QmSampleHash"; // IPFS hash for the issue description
   const descriptionContentHash = ethers.keccak256(ethers.toUtf8Bytes('Sample Content')); // Hash of the issue content
   const durationDays = 10000000; // Duration of the journal issue in days
-  const articleStakeRequired = ethers.parseEther("10"); // Stake required for submitting an article
+  const articleStakeRequired = ethers.parseEther("100"); // Stake required for submitting an article
+  const reviewStakeRequired = ethers.parseEther("10"); // Stake required for submitting an article
 
   journalCredit.approve(journalCore.target, ethers.parseEther("10000")); // Approve the JournalCore contract to spend the journal credit
-  const tx = await journalCore.createIssue(issueName, descriptionIpfsHash, descriptionContentHash, durationDays, articleStakeRequired); // Create a new journal issue
+  const tx = await journalCore.createIssue(issueName, descriptionIpfsHash, descriptionContentHash, durationDays, articleStakeRequired, reviewStakeRequired); // Create a new journal issue
   console.log("JournalIssue created with name:", issueName); // Log the name of the created journal issue
 
   // Wait for the transaction to be mined
