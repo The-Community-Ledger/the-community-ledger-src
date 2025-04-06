@@ -19,6 +19,19 @@ function IssuePanel({ issue }) {
     const [ isLoading, setIsLoading ] = useState(false);
     const [ isSubmitted, setIsSubmitted ] = useState(false);
     const [ isOwner, setIsOwner ] = useState(false);
+    const [ isIssueOpen, setIsIssueOpen ] = useState(false);
+
+    // Is the issue open?
+    useEffect(() => {
+        const checkIssueStatus = async () => {
+            if (walletConnectionStatus === "connected" && issue) {
+                const isOpen = await issue.contract.isOpen();
+                console.log("Checking issue status:", { issue, isOpen });
+                setIsIssueOpen(isOpen);
+            }
+        }
+        checkIssueStatus();
+    }, [issue, walletConnectionStatus]);
 
     // Fetch articles for the issue
     useEffect(() => {
@@ -120,15 +133,15 @@ function IssuePanel({ issue }) {
         <div className={styles.container}>
           <div className={styles.header} > 
             <h3 className={styles.title}><it style={{fontStyle: 'italics', fontSize: '0.9rem'}}>Issue:</it> {issue.name}.</h3>
-            <div className={styles.statusBadge} style={{backgroundColor: issue.isOpen ? 'green' : 'red' }}>
-              <p className={styles.statusText}>{issue.isOpen ? "Open" : "Closed"}</p>
+            <div className={styles.statusBadge} style={{backgroundColor: isIssueOpen ? 'green' : 'red' }}>
+              <p className={styles.statusText}>{isIssueOpen ? "Open" : "Closed"}</p>
             </div>
             <div>
               { !isSubmitted && <a href='#' style={{fontStyle: 'italic'}} onClick={() => setModalOpen(true)}>Submit an article.</a> }
               { isSubmitted && <p style={{fontStyle: 'italic'}}>Article submitted.</p> }
             </div>
             <div>
-              {isOwner && <p style={{marginLeft:'500px', fontStyle: 'italic'}}>You are the owner of this issue. <a href='#' onClick={handleCloseIssue}>Close it.</a></p>}
+              {isOwner && <p style={{marginLeft:'500px', fontStyle: 'italic'}}>You are the owner of this issue. {isIssueOpen ? <a href='#' onClick={handleCloseIssue}>Close it.</a> : <></>}</p>}
             </div>
           </div>
     
