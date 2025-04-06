@@ -84,10 +84,16 @@ contract JournalCore {
         jcrToken.transfer(issue.getOwner(), ownersReward);
         
         for (uint256 i = 0; i < authors.length; i++) {
+            if (authors[i] == issue.getOwner()) {
+                continue; // Skip if the author is the owner
+            }
             jcrToken.approve(authors[i], authorsReward);
             jcrToken.transfer(authors[i], authorsReward);
         }
         for (uint256 i = 0; i < reviewers.length; i++) {
+            if (reviewers[i] == issue.getOwner()) {
+                continue; // Skip if the reviewer is the owner
+            }
             jcrToken.approve(reviewers[i], reviewersReward);
             jcrToken.transfer(reviewers[i], reviewersReward);
         }
