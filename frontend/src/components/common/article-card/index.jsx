@@ -182,18 +182,50 @@ function ArticleCard({ article }) {
                 initialValue=""
             />
 
-            <div style={{ padding: "2rem", paddingTop: '1rem', minWidth: "400px", height: "550px", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)", fontSize: '60%', overflow: 'scroll', 
-                display: 'flex', flexDirection: 'column', gap: "2rem"
+            <div style={{
+                position: 'relative', 
+                padding: "2rem",
+                paddingTop: '1rem',
+                minWidth: "400px",
+                height: "550px",
+                boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                fontSize: '60%',
+                overflow: 'scroll',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: "2rem"
             }}>
+                {reviewCount > 0 && (
+                    <div style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        width: '20px',
+                        height: '20px',
+                        backgroundColor: '#16a34a',
+                        color: 'white',
+                        borderRadius: '50%',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}>
+                        {reviewCount.toString()}
+                    </div>
+                )}
+
                 <div style={{ borderBottom: "1px solid #eee", paddingBottom: "1rem" }}>
-                    { content && <MDEditor.Markdown source={ content } previewOptions={{rehypePlugins: [[rehypeSanitize]],}}/> }
-                    { isLoading && <p>Loading...</p> }
-                    { error && <p>Error: {error.message}</p> }
+                    {content && <MDEditor.Markdown source={content} previewOptions={{ rehypePlugins: [[rehypeSanitize]] }} />}
+                    {isLoading && <p>Loading...</p>}
+                    {error && <p>Error: {error.message}</p>}
                 </div>
-                {(isLoading || isFetching || hasReviewed) && <button style={inactiveButtonStyle} disabled={true}>Reviewed</button>}
-                {!(isLoading || isFetching || hasReviewed) && 
+
+                {(isLoading || isFetching || hasReviewed) && (
+                    <button style={inactiveButtonStyle} disabled={true}>Reviewed</button>
+                )}
+                {!(isLoading || isFetching || hasReviewed) && (
                     <button style={activeButtonStyle} onClick={() => setModalOpen(true)}>Review</button>
-                }
+                )}
             </div>
         </>
      );
