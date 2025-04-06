@@ -47,7 +47,7 @@ async function main() {
 
   // Deploy an example of the JournalIssue/Article/Review contracts
 
-  const issueNames = ["Advances", "Research", "Innovation"]; // Names of the journal issues
+  const issueNames = ["Community Advances", "Community Interface", "Community Spotlights"]; // Names of the journal issues
   for (const issueName of issueNames) {
     await createIssue(issueName, journalCredit, journalCore); // Create a new journal issue
   }
@@ -104,6 +104,18 @@ async function createIssue(issueName, journalCredit, journalCore) {
 
     console.log("Article created: Sample Article Number ", i); // Log the ID of the created article
   }
+
+
+  if (issueName === "Community Advances") {
+    await journalIssue.transferOwnership("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"); // Transfer ownership to a specific address
+  } else {
+    await journalIssue.transferOwnership("0x70997970C51812dc3A010C7d01b50e0d17dc79C8"); // Transfer ownership to a different address
+  }
+
+  console.log("Issue owner:", await journalIssue.getOwner()); // Log the owner of the journal issue  
+  console.log("Contract owner:", await journalIssue.owner()); // Log the owner of the journal issue
+
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere

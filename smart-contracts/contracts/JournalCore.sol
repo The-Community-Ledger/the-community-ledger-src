@@ -54,7 +54,8 @@ contract JournalCore {
             descriptionContentHash,
             durationDays,
             articleStakeRequired, 
-            reviewStakeRequired
+            reviewStakeRequired, 
+            msg.sender
         );
 
         issues.push(IJournalIssue(issueAddress));

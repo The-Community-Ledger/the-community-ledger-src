@@ -12,12 +12,13 @@ import { ethers } from "ethers";
 function IssuePanel({ issue }) {
     const [ articles, setArticles ] = useState([]);
     const { fetchArticlesForIssue } = useJournalContent();
-    const { walletConnectionStatus } = useWallet();
+    const { walletConnectionStatus, walletAddress } = useWallet();
     const { fetchIpfsData, storeIpfsData } = useIpfsStore();
     const [ modalOpen, setModalOpen ] = useState(false);    
     const [ submitError, setSubmitError ] = useState('');
     const [ isLoading, setIsLoading ] = useState(false);
     const [ isSubmitted, setIsSubmitted ] = useState(false);
+    const [ isOwner, setIsOwner ] = useState(false);
 
     // Fetch articles for the issue
     useEffect(() => {
@@ -31,6 +32,19 @@ function IssuePanel({ issue }) {
             _fetchArticles();
         }
     }, [issue, walletConnectionStatus]);
+
+    // Check if the user is the owner of the issue
+    useEffect(() => {
+        const checkOwner = async () => {
+            if (walletConnectionStatus === "connected" && issue) {
+                const isOwner = await issue.contract.owner() === walletAddress;
+                console.log("Checking owner status:", { owner: issue.owner, walletAddress, isOwner });
+                setIsOwner(isOwner);
+            }
+        }
+        checkOwner();
+    }, [issue, walletConnectionStatus]);
+
 
     // Handle markdown submit
     const handleSubmit = async (md) => {
@@ -80,6 +94,16 @@ function IssuePanel({ issue }) {
        setIsLoading(false);
     }
 
+    const handleCloseIssue = async () => {
+        try {
+            const closeTx = await issue.contract.closeIssue();
+            console.log("Transaction submitted:", closeTx);
+        } catch (error) {
+            console.error("Error closing issue:", error);
+            setSubmitError("Error closing issue.");
+        }   
+    }
+
     return (
       <>
         <MarkdownModal
@@ -89,19 +113,22 @@ function IssuePanel({ issue }) {
           error={submitError}
           onClose={() => setModalOpen(false)}
           onSubmit={handleSubmit}
-          title={"Submit an article to " + issue.name}
+          title={"Submit an article to " + issue.name }
           initialValue=""
          />
 
         <div className={styles.container}>
           <div className={styles.header} > 
-            <h3 className={styles.title}>{issue.name}</h3>
+            <h3 className={styles.title}><it style={{fontStyle: 'italics', fontSize: '0.9rem'}}>Issue:</it> {issue.name}.</h3>
             <div className={styles.statusBadge} style={{backgroundColor: issue.isOpen ? 'green' : 'red' }}>
               <p className={styles.statusText}>{issue.isOpen ? "Open" : "Closed"}</p>
             </div>
             <div>
               { !isSubmitted && <a href='#' style={{fontStyle: 'italic'}} onClick={() => setModalOpen(true)}>Submit an article.</a> }
               { isSubmitted && <p style={{fontStyle: 'italic'}}>Article submitted.</p> }
+            </div>
+            <div>
+              {isOwner && <p style={{marginLeft:'500px', fontStyle: 'italic'}}>You are the owner of this issue. <a href='#' onClick={handleCloseIssue}>Close it.</a></p>}
             </div>
           </div>
     

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useIpfsStore } from "@/hooks/useIpfsStore";
 import { useWallet } from "@/hooks/useWallet";
 import { ethers } from "ethers";
@@ -11,6 +11,8 @@ import rehypeSanitize from "rehype-sanitize";
 
 import MarkdownModal from "../markdown-modal";
 import { useJournalContent } from "@/hooks/useJournalContent";
+
+import { getRandomSampleArticle } from "./const";
 
 
 const sampleArticle = {
@@ -72,7 +74,6 @@ function ArticleCard({ article }) {
     const [ isStoring, setIsStoring ] = useState(false);
     const [ reviews, setReviews ] = useState([]);
 
-
     // Update states from contract
     useEffect(() => {
         const fetchReviewStatus = async () => {
@@ -99,7 +100,11 @@ function ArticleCard({ article }) {
                 console.log("Fetching IPFS data for article:", article);
                 let data; 
                 if ( article.ipfsHash.startsWith("QmSample") ) {
-                    data = sampleArticle;   
+                    data = getRandomSampleArticle();
+                    let cid = await storeIpfsData(data);
+                    console.log("Stored sample IPFS data with CID:", cid);
+                    article.ipfsHash = cid;
+
                 } else {
                     data = await fetchIpfsData(article.ipfsHash);
                 }
@@ -187,6 +192,7 @@ function ArticleCard({ article }) {
                 padding: "2rem",
                 paddingTop: '1rem',
                 minWidth: "400px",
+                maxWidth: "400px",
                 height: "550px",
                 boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
                 fontSize: '60%',
@@ -214,10 +220,21 @@ function ArticleCard({ article }) {
                     </div>
                 )}
 
-                <div style={{ borderBottom: "1px solid #eee", paddingBottom: "1rem" }}>
-                    {content && <MDEditor.Markdown source={content} previewOptions={{ rehypePlugins: [[rehypeSanitize]] }} />}
-                    {isLoading && <p>Loading...</p>}
-                    {error && <p>Error: {error.message}</p>}
+                <div style={{ borderBottom: "1px solid #eee", paddingBottom: "1rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    {article.ipfsHash && (
+                        <a 
+                            href={`http://ipfs.io/ipfs/${article.ipfsHash}`}
+                            style={{ fontSize: '0.7rem', color: '#ccc', textDecoration: 'none', position: 'absolute', top: '8px', left: '8px'}}
+                            target="_blank"
+                        >
+                            ipfs://{article.ipfsHash}
+                        </a>
+                    )}
+                    <div style={{ marginTop: "1rem"}}>
+                        {content && <MDEditor.Markdown source={content} previewOptions={{ rehypePlugins: [[rehypeSanitize]] }} />}
+                        {isLoading && <p>Loading...</p>}
+                        {error && <p>Error: {error.message}</p>}
+                    </div>
                 </div>
 
                 {(isLoading || isFetching || hasReviewed) && (

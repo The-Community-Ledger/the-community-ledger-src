@@ -56,11 +56,12 @@ contract JournalIssue is Ownable {
         uint256 _durationDays,
         uint256 _articleStakeRequired, 
         uint256 _reviewStakeRequired,
-        address _articleFactory
-    ) Ownable(msg.sender) { 
+        address _articleFactory,
+        address _owner
+    ) Ownable(_owner) { 
         jcrToken = IERC20(_jcrToken); // Set the ERC20 token
         issueId = _issueId; // Set the issue ID
-        issueOwner = msg.sender; // Set the owner of the issue
+        issueOwner = _owner; // Set the owner of the issue
         issueOpenTime = block.timestamp; // Set the opening time
         issueCloseTime = block.timestamp + (_durationDays * 1 days); // Set the closing time
         articleStakeRequired = _articleStakeRequired; // Set the required stake

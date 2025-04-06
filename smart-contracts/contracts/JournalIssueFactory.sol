@@ -19,7 +19,8 @@ contract JournalIssueFactory {
             bytes32 descriptionContentHash, 
             uint256 durationDays,
             uint256 articleStakeRequired,
-            uint256 reviewStakeRequired
+            uint256 reviewStakeRequired, 
+            address owner
         ) external returns (address) {
         JournalIssue issue = new JournalIssue(
             issueId,
@@ -30,7 +31,8 @@ contract JournalIssueFactory {
             durationDays,
             articleStakeRequired,
             reviewStakeRequired,
-            articleFactory
+            articleFactory,
+            owner
         );
         return address(issue);
     }
@@ -44,6 +46,7 @@ interface IJournalIssueFactory {
         bytes32 descriptionContentHash, 
         uint256 durationDays,
         uint256 articleStakeRequired,
-        uint256 reviewStakeRequired
+        uint256 reviewStakeRequired, 
+        address owner
     ) external returns (address);
 }
