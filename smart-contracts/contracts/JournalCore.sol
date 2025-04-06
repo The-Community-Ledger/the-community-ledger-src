@@ -4,6 +4,7 @@ pragma solidity ^0.8.21;
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IJournalIssueFactory } from "./JournalIssueFactory.sol";
 import { IJCRMinter} from "./JournalCredit.sol";
+import {console}  from "hardhat/console.sol";
 
 interface IJournalIssue {
     function submitArticle(string calldata _ipfsHash, bytes32 _contentHash) external;
@@ -67,36 +68,53 @@ contract JournalCore {
             address[] calldata authors,
             address[] calldata reviewers
         ) external {
+        console.log("Rewarding for issue:", msg.sender); // Log the issue address
         require(isKnownIssue[msg.sender], "Unknown issue");
         require(!isRewarded[msg.sender], "Already rewarded");
 
+        // filter out the owner and 0x0 from authors and reviewers
+        address[] memory filteredAuthors = new address[](authors.length);
+        address[] memory filteredReviewers = new address[](reviewers.length);
+        uint256 authorCount = 0;
+        uint256 reviewerCount = 0;
+        for (uint256 i = 0; i < authors.length; i++) {
+            if (authors[i] != msg.sender && authors[i] != address(0)) {
+                filteredAuthors[authorCount] = authors[i];
+                authorCount++;
+            }
+        }
+        for (uint256 i = 0; i < reviewers.length; i++) {
+            if (reviewers[i] != msg.sender && reviewers[i] != address(0)) {
+                filteredReviewers[reviewerCount] = reviewers[i];
+                reviewerCount++;
+            }
+        }
+        console.log('Computing rewards'); // Log the reward computation
         IJournalIssue issue = IJournalIssue(msg.sender);
-        uint256 mintFactor = 1000 + 500 * (authors.length + reviewers.length - 1) / (authors.length + reviewers.length);
+        uint256 mintFactor = 1000 + 500 * (authorCount + reviewerCount - 1) / (authorCount + reviewerCount);
         uint256 ownersReward = issueStakeRequired * mintFactor / 1000;
-        uint256 authorsReward = issue.getArticleStakeRequired() * mintFactor/ 1000;
-        uint256 reviewersReward = issue.getReviewerStakeRequired() * mintFactor/ 1000;
-        uint256 jcrToMint = ownersReward - issueStakeRequired + (authorsReward - issue.getArticleStakeRequired()) * authors.length + (reviewersReward - issue.getReviewerStakeRequired()) * reviewers.length;
-        
+        uint256 authorsReward = issue.getArticleStakeRequired() * mintFactor / 1000;
+        uint256 reviewersReward = issue.getReviewerStakeRequired() * mintFactor / 1000;
+        uint256 jcrToMint = ownersReward - issueStakeRequired + (authorsReward - issue.getArticleStakeRequired()) * authorCount + (reviewersReward - issue.getReviewerStakeRequired()) * reviewerCount;
 
+        console.log('Minting rewards'); // Log the reward minting
         IJCRMinter jcrTokenMinter = IJCRMinter(address(jcrToken));
         jcrTokenMinter.mint(address(this), jcrToMint);
 
+        console.log('Transferring rewards'); // Log the reward transfer
         jcrToken.approve(address(issue.getOwner()), ownersReward);
         jcrToken.transfer(issue.getOwner(), ownersReward);
-        
-        for (uint256 i = 0; i < authors.length; i++) {
-            if (authors[i] == issue.getOwner()) {
-                continue; // Skip if the author is the owner
-            }
-            jcrToken.approve(authors[i], authorsReward);
-            jcrToken.transfer(authors[i], authorsReward);
+
+        console.log('Transferring rewards to filtered authors and reviewers'); // Log the reward transfer to filtered authors and reviewers
+        for (uint256 i = 0; i < authorCount; i++) {
+            console.log('Transferring rewards to author:', filteredAuthors[i]); // Log the author address
+            jcrToken.approve(filteredAuthors[i], authorsReward);
+            jcrToken.transfer(filteredAuthors[i], authorsReward);
         }
-        for (uint256 i = 0; i < reviewers.length; i++) {
-            if (reviewers[i] == issue.getOwner()) {
-                continue; // Skip if the reviewer is the owner
-            }
-            jcrToken.approve(reviewers[i], reviewersReward);
-            jcrToken.transfer(reviewers[i], reviewersReward);
+        for (uint256 i = 0; i < reviewerCount; i++) {
+            console.log('Transferring rewards to reviewer:', filteredReviewers[i]); // Log the reviewer address
+            jcrToken.approve(filteredReviewers[i], reviewersReward);
+            jcrToken.transfer(filteredReviewers[i], reviewersReward);
         }
         isRewarded[msg.sender] = true;
     }

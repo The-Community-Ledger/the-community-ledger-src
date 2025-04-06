@@ -18,7 +18,7 @@ interface IReview {
 }
 
 interface IJournalCore {
-    function rewardFromIssue(address[] memory authors, address[] memory reviewers) external;
+    function rewardForIssue(address[] memory authors, address[] memory reviewers) external;
 }
 
 // Contract for managing a journal issue
@@ -98,24 +98,31 @@ contract JournalIssue is Ownable {
     }
 
     // Function to close the issue
-    function closeIssue() external onlyOwner  {
+    function closeIssue() public onlyOwner  {
+        console.log("Closing issue:", issueId); // Log the issue closure
         require(!closed, "Issue is already closed"); // Ensure the issue is not already closed
         closed = true; // Set the issue as closed
 
+        console.log('Listing authors and reviewers'); // Log the authors and reviewers
         // Collect address of authors and reviewers
         address[] memory authors = new address[](articles.length);
         address[] memory reviewers = new address[](articles.length);
         for (uint256 i = 0; i < articles.length; i++) {
             authors[i] = articles[i].getSubmitter(); // Get the submitter of each article
             address[] memory articleReviews = IArticle(address(articles[i])).getReviews(); // Get the reviewers of each article
+            console.log('got article reviews', articleReviews.length); // Log the number of reviews
             for (uint256 j = 0; j < articleReviews.length; j++) {
                 reviewers[j] = IReview(articleReviews[j]).getReviewer(); // Store the reviewers
+                console.log('got reviewer', reviewers[j]); // Log the reviewer
             }
         }
+        console.log('got authors', authors.length); // Log the authors
+        console.log('got reviewers', reviewers.length); // Log the authors
 
         address journalCore = IJCRMinter(address(jcrToken)).getMinter();
-        IJournalCore(journalCore).rewardFromIssue(authors, reviewers); // Reward authors and reviewers
+        IJournalCore(journalCore).rewardForIssue(authors, reviewers); // Reward authors and reviewers
 
+        console.log("Issue closed and rewards distributed"); // Log the reward distribution
         emit IssueClosed(issueId); // Emit the issue closed event
     }
 

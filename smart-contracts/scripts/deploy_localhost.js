@@ -90,6 +90,7 @@ async function createIssue(issueName, journalCredit, journalCore) {
   const JournalIssue = await ethers.getContractFactory("JournalIssue"); // Get the contract factory for JournalIssue
   const journalIssue = await JournalIssue.attach(issueAddress); // Attach to the deployed JournalIssue contract
 
+
   /** 
    * Deploy several sample Article contracts
    */
@@ -108,6 +109,7 @@ async function createIssue(issueName, journalCredit, journalCore) {
 
   if (issueName === "Community Advances") {
     await journalIssue.transferOwnership("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"); // Transfer ownership to a specific address
+    await journalIssue.closeIssue(); // Close the journal issue
   } else {
     await journalIssue.transferOwnership("0x70997970C51812dc3A010C7d01b50e0d17dc79C8"); // Transfer ownership to a different address
   }
