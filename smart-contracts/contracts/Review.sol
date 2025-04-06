@@ -76,5 +76,9 @@ contract Review {
         return (challenge.challenger, challenge.ipfsHash, challenge.contentHash); // Return the challenge details
     }
 
+    function getReviewer() external view returns (address) {
+        return reviewer; // Return the reviewer's address
+    }
+
 
 }
